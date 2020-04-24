@@ -51,15 +51,6 @@ export default {
     resetLoginForm () {
       this.$refs.loginFormRef.resetFields()
     },
-    // login () {
-    //   this.$refs.loginFormRef.validate(async valid => {
-    //     if (!valid) return
-    //     const { data: result } = await this.$http.post('login', this.loginForm)
-    //     if (result.meta.status !== 200) return this.$message.error(result.meta.msg)
-    //     window.sessionStorage.setItem('token', result.data.token)
-    //     this.$router.push('/home')
-    //   })
-    // },
 
     // 提交
     onSubmit () {
