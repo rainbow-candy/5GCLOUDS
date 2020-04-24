@@ -252,12 +252,16 @@ export default {
   .tab {
     display: flex;
     margin-top: 20px;
+    // 位置修改
+    position: absolute;
+    top: 24px;
+    left: 243px;
     img {
-      width: 200px;
+      width: 170px;
       cursor: pointer;
     }
     .span2 {
-      margin-left: -42px;
+      margin-left: -35px;
     }
   }
   .gjcForm {

@@ -1,8 +1,9 @@
 <template>
   <div class="box">
     <div>
-      <h1>发布任务</h1>
-      <div class="to-home" @click="toHome" title="返回首页"><i class="el-icon-s-home"></i>快手首页</div>
+      <img src="@/assets/imgs/title-fbrw.png" alt class="content-title"/>
+      <img src="@/assets/imgs/newlogo.png" alt style="width: 50px;position: absolute;right: 170px;top: 20px;"/>
+      <div class="to-home" @click="toHome"><i class="el-icon-s-home"></i>返回快手首页</div>
       <img src="@/assets/imgs/ks-logo.png" alt="" class="logo">
     </div>
     <div class="content">
@@ -60,16 +61,18 @@ export default {
 
 <style lang="less" scoped>
 .box {
-  padding: 40px;
-  h1 {
-    font-size: 2.7rem;
-    color: black;
+  padding: 100px 40px 0 40px;
+  .content-title {
+    width: 300px;
+    position: absolute;
+    left: -2px;
+    top: -3px;
   }
   .to-home {
     font-size: 1.5rem;
     position: absolute;
-    right: 200px;
-    top: 30px;
+    right: 50px;
+    top: 90px;
     cursor: pointer;
     i {
       margin-right: 10px;
