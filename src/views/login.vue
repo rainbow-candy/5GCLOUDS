@@ -51,7 +51,6 @@ export default {
     resetLoginForm () {
       this.$refs.loginFormRef.resetFields()
     },
-
     // 提交
     onSubmit () {
       this.$refs.loginFormRef.validate((valid) => {
