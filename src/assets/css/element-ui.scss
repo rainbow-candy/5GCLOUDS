@@ -22,3 +22,12 @@
 .el-tree-node__label {
   @extend .text-ellipsis;
 }
+.el-popover {
+  font-size: 16px;
+  background-color: #ccc;
+  border-radius: 20px;
+  .el-popover__title {
+    font-weight: 700;
+    font-size: 20px;
+  }
+}

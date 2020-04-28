@@ -11,10 +11,10 @@
       </div>
       <div>
         <img src="@/assets/imgs/gjcss.png" alt class="leftImg" @click="gjcss" />
-        <img src="@/assets/imgs/ckrw.png" alt class="rightImg" @click="ckrw" />
+        <img src="@/assets/imgs/rwlb.png" alt class="rightImg" @click="ckrw" />
       </div>
       <div>
-        <img src="@/assets/imgs/xxfk.png" alt class="centerImg" @click="xxfk" />
+        <img src="@/assets/imgs/khfk.png" alt class="centerImg" @click="xxfk" />
       </div>
     </div>
   </div>

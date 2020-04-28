@@ -21,6 +21,10 @@
       <!-- 关键词摘取 -->
       <div v-show="isActive" class="gjcForm">
         <el-form label-position="left" label-width="100px" :model="form">
+          <el-form-item label="选择设备：">
+            <i class="el-icon-plus" @click="xzsb"></i>
+            <base-table :columns="sbColumns" :data="tableData" selection v-show="sbShow"></base-table>
+          </el-form-item>
           <el-form-item label="关键词：">
             <el-input v-model="form.name"></el-input>
           </el-form-item>
@@ -33,10 +37,6 @@
                 :value="item.value">
               </el-option>
             </el-select>
-          </el-form-item>
-          <el-form-item label="选择设备：">
-            <i class="el-icon-plus" @click="xzsb"></i>
-            <base-table :columns="sbColumns" :data="tableData" selection v-show="sbShow"></base-table>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="onSubmit">执行</el-button>
@@ -184,6 +184,7 @@ export default {
     // 空对象
     var obj = {}
     const newData = this.tableData.concat();
+    this.sbColumns[1].filterData = [];
     // 遍历
     for (let i = 0; i < newData.length; i++) {
       if (obj[newData[i].num] === undefined) {

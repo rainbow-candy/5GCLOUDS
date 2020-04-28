@@ -7,14 +7,14 @@
               <!-- 登录表单区域 -->
           <el-form :model="loginForm" label-width="0px" class="login_form" :rules="rules" ref="loginFormRef">
               <el-form-item prop="username">
-                  <el-input placeholder="请输入账号" prefix-icon="iconfont icon-user" v-model="loginForm.username"></el-input>
+                  <el-input placeholder="请输入账号" prefix-icon="iconfont icon-user" v-model="loginForm.username" @keyup.enter.native="onSubmit"></el-input>
               </el-form-item>
               <el-form-item prop="password">
-                  <el-input placeholder="请输入密码" prefix-icon="iconfont icon-3702mima" v-model="loginForm.password" type="password"></el-input>
+                  <el-input placeholder="请输入密码" prefix-icon="iconfont icon-3702mima" v-model="loginForm.password" type="password" @keyup.enter.native="onSubmit"></el-input>
               </el-form-item>
               <el-row class="btns">
-                  <el-button type="primary" @click="onSubmit">登录</el-button>
-                  <el-button  type="info" @click="resetLoginForm">重置</el-button>
+                  <el-button type="primary" @click="onSubmit" @keyup.enter.native="onSubmit">登录</el-button>
+                  <el-button  type="info" @click="resetLoginForm">取消</el-button>
               </el-row>
           </el-form>
         </div>
@@ -69,7 +69,7 @@ export default {
                 const parameter = {
                   token: 'JWT ' + res.data.token
                 };
-                window.localStorage.setItem('token', parameter.token);
+                window.sessionStorage.setItem('token', parameter.token);
                 location.reload();
                 // 获取token过期时间
                 const expires = setUserLocal();
@@ -85,7 +85,7 @@ export default {
             }, function () {
               _this.$message({
                 type: 'error',
-                message: '禁止多处登录！'
+                message: '服务异常！'
               });
             })
             .finally(() => {

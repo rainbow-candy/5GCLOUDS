@@ -7,10 +7,11 @@ import { stringify } from 'qs';
 */
 export const TIME_OUT = 10000;    // 请求超时时间
 export const ERR_OK = true;      // 请求成功返回状态，字段和后台统一
-export const baseUrl = 'http://192.168.1.44:8888/api/'
+export const baseUrl = 'http://112.74.103.26/api/'
+// export const baseUrl = 'http://192.168.1.52:8888/api/'
 // 请求超时时间
 axios.defaults.timeout = TIME_OUT
-axios.defaults.headers['authorization'] = window.localStorage.getItem('token');
+axios.defaults.headers['authorization'] = window.sessionStorage.getItem('token');
 
 // 封装请求拦截
 axios.interceptors.request.use(

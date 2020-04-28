@@ -18,7 +18,9 @@ import {
   Header,
   Aside,
   Main,
-  TableColumn
+  TableColumn,
+  Upload,
+  InputNumber
 } from 'element-ui'
 // import ElementUI from 'element-ui';
 
@@ -39,5 +41,8 @@ Vue.use(Header)
 Vue.use(Aside)
 Vue.use(Main)
 Vue.use(TableColumn)
+Vue.use(Upload)
+Vue.use(InputNumber)
 Vue.prototype.$message = Message
 Vue.prototype.$confirm = MessageBox.confirm;
+Vue.prototype.$alert = MessageBox.alert;

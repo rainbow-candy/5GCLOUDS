@@ -1,6 +1,7 @@
 <template>
   <div>
     <img src="@/assets/imgs/zhu-home.png" alt class="zhu-home" />
+    <div class="login_name">{{app_info.username}}</div>
     <img src="@/assets/imgs/logout.png" alt class="logout-home" @click="logout"/>
     <img src="@/assets/imgs/right-home.png" alt class="right-home" />
     <img src="@/assets/imgs/left-home.png" alt class="left-home" />
@@ -9,19 +10,20 @@
     </div>
     <div class="content">
       <div style="text-align: center;">
-        <!-- <el-popover
+        <el-popover
           placement="top"
           title="提示"
-          width="200"
-          trigger="manual"
-          content="快手功能正在开发中。"
+          width="270"
+          trigger="hover"
+          content="升级版即将上线，敬请期待......"
           v-model="visible">
           <img src="@/assets/imgs/ks-btn.png" alt class="ks" @click="visible = !visible" slot="reference"/>
-        </el-popover> -->
-        <img src="@/assets/imgs/ks-btn.png" alt class="ks" @click="toKS" />
+        </el-popover>
+        <!-- <img src="@/assets/imgs/ks-btn.png" alt class="ks" @click="toKS" /> -->
         <img src="@/assets/imgs/dy-btn.png" alt class="dy" @click="toDY" />
       </div>
     </div>
+    <div>vip服务时间截止为2020-02-12</div>
   </div>
 </template>
 
@@ -33,8 +35,12 @@ import router from '@/router/index.js';
 export default {
   data () {
     return {
-      visible: false
+      visible: false,
+      app_info: {}
     }
+  },
+  mounted () {
+    this.app_info = JSON.parse(window.localStorage.getItem('APP_INFO'));
   },
   methods: {
     logout () {
@@ -47,6 +53,7 @@ export default {
             router.go(-1);
             router.push('/login')
             window.localStorage.clear();
+            window.sessionStorage.clear();
           }
         })
     },
@@ -71,14 +78,14 @@ export default {
   position: absolute;
   left: -1px;
   top: -6px;
-  width: 21%;
+  width: 300px;
 }
 .logout-home {
   position: absolute;
   cursor: pointer;
   right: 0;
   top: -4px;
-  width: 21%;
+  width: 300px;
 }
 .right-home {
   position: absolute;

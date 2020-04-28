@@ -1,7 +1,7 @@
 <template>
   <div class="box">
     <div>
-      <img src="@/assets/imgs/title-xxfk.png" alt class="content-title"/>
+      <img src="@/assets/imgs/title-khfk.png" alt class="content-title"/>
       <div class="to-home" @click="toHome">
         <div v-if="this.$route.query.type === 'dy'"><i class="el-icon-s-home"></i>返回抖音首页</div>
         <div v-if="this.$route.query.type !== 'dy'"><i class="el-icon-s-home"></i>返回快手首页</div>
@@ -56,9 +56,11 @@ export default {
         if (valid) {
           wdsbServer.feedback(this.form).then(res => {
             if (res.status === 200) {
-              this.$message({
-                message: '信息反馈成功！',
-                type: 'success'
+              // this.$alert('感谢您的帮助与支持！', '反馈成功', {
+              //   confirmButtonText: '确定'
+              // });
+              this.$alert('<h2>感谢您的帮助与支持!</h2>', '反馈成功', {
+                dangerouslyUseHTMLString: true
               });
             }
           })

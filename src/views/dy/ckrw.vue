@@ -1,7 +1,7 @@
 <template>
   <div class="box">
     <div>
-      <img src="@/assets/imgs/title-ckrw.png" alt class="content-title"/>
+      <img src="@/assets/imgs/title-rwlb.png" alt class="content-title"/>
       <div class="to-home" @click="toHome">
         <div v-if="this.$route.query.type === 'dy'"><i class="el-icon-s-home"></i>返回抖音首页</div>
         <div v-if="this.$route.query.type !== 'dy'"><i class="el-icon-s-home"></i>返回快手首页</div>
@@ -47,6 +47,12 @@ export default {
           label: '设备'
         },
         {
+          prop: 'group',
+          label: '分组（可筛选）',
+          filter: true,
+          filterData: []
+        },
+        {
           prop: 'task_nick',
           label: '任务昵称'
         },
@@ -58,7 +64,8 @@ export default {
         {
           prop: 'zt',
           label: '工作状态',
-          sortable: true
+          sortable: true,
+          backColor: true
         }
       ],
       selectTableRow: [],
@@ -73,11 +80,23 @@ export default {
     },
     // 继续
     startRow (row) {
-      this.suspendVideo(row.key, { stats: 1 });
+      this.$confirm('是否确认继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.suspendVideo(row.key, { stop_task: 1 });
+      })
     },
     // 暂停
     suspendRow (row) {
-      this.suspendVideo(row.key, { stats: 0 });
+      this.$confirm('是否确认暂停?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.suspendVideo(row.key, { stop_task: 0 });
+      })
     },
     // 批量暂停
     suspends () {
@@ -86,11 +105,17 @@ export default {
         ids += t.key + ','
       });
       ids = ids.substr(0, ids.length - 1);
-      this.suspendVideo(ids, { stats: 0 });
+      this.$confirm('是否确认暂停?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.suspendVideo(ids, { stop_task: 0 });
+      })
     },
     // 删除当前行
     deleteRow (row) {
-      this.$confirm('确认删除该任务吗, 是否继续?', '提示', {
+      this.$confirm('是否确认删除?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -105,7 +130,7 @@ export default {
         ids += t.id + ','
       });
       ids = ids.substr(0, ids.length - 1);
-      this.$confirm('确认删除该任务吗, 是否继续?', '提示', {
+      this.$confirm('是否确认删除?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -133,9 +158,9 @@ export default {
     },
     // 视频删除
     pauseVideo (ids) {
-      const url = 'task/my_dev/' + ids + '/';
-      wdsbServer.deleteDev(url).then(res => {
-        if (res.status === 204) {
+      const url = 'task/dev/' + ids + '/';
+      wdsbServer.deleteDev(url, { del_task: '1' }).then(res => {
+        if (res.status === 200) {
           this.$message({
             message: '删除成功！',
             type: 'success'
@@ -148,19 +173,44 @@ export default {
     // 获取列表
     getList () {
       this.tableData = [];
-      wdsbServer.myDev().then(res => {
+      wdsbServer.myDev({ task: '1' }).then(res => {
         if (res.status === 200) {
           res.data.forEach((t) => {
-            if (t.device.stats === 1) {
+            if (t.stats === 1) {
               t.zt = '正在执行';
             } else {
               t.zt = '未执行';
             }
-            t.name = t.device.name;
-            t.key = t.device.id;
+            t.key = t.id;
             this.tableData.push(t);
           });
+          this.getFilterData(this.tableData);
         }
+      })
+    },
+    // 获取筛选数组
+    getFilterData (data) {
+      // 空对象
+      var obj = {}
+      this.tableColumns[2].filterData = [];
+      const newData = data.concat();
+      // 遍历
+      for (var i = 0; i < newData.length; i++) {
+        if (newData[i].group) {
+          if (obj[newData[i].group] === undefined) {
+            // 随便贴一个不为空的值
+            obj[newData[i].group] = 1;
+          } else {
+            newData.splice(i--, 1)
+          }
+        } else {
+          newData.splice(i--, 1)
+        }
+      }
+      newData.forEach((item, index) => {
+        this.tableColumns[1].filterData.push(
+          Object.assign({}, item, { text: item.group, value: item.group })
+        )
       })
     }
   },

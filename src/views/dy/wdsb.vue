@@ -48,7 +48,7 @@ export default {
         },
         {
           prop: 'group',
-          label: '分组',
+          label: '分组（可筛选）',
           filter: true,
           filterData: []
         },
@@ -84,6 +84,7 @@ export default {
     getFilterData (data) {
       // 空对象
       var obj = {}
+      this.tableColumns[2].filterData = [];
       const newData = data.concat();
       // 遍历
       for (var i = 0; i < newData.length; i++) {
@@ -106,25 +107,29 @@ export default {
     },
     getList () {
       this.tableData = [];
+      const _this = this;
       wdsbServer.myDev().then(res => {
         if (res.status === 200) {
           res.data.forEach((t) => {
-            t.device.group = t.group;
-            t.device.id = t.id;
-            if (t.device.stats === 1) {
-              t.device.stats = '正在执行';
+            if (t.stats === 1) {
+              t.stats = '正在执行';
             } else {
-              t.device.stats = '未执行';
+              t.stats = '未执行';
             }
-            if (t.device.online === 1) {
-              t.device.online = '在线';
+            if (t.online === 1) {
+              t.online = '在线';
             } else {
-              t.device.online = '离线';
+              t.online = '离线';
             }
-            this.tableData.push(t.device);
           });
+          this.tableData = res.data;
           this.getFilterData(this.tableData);
         }
+      }, function () {
+        _this.$message({
+          type: 'error',
+          message: '服务异常！'
+        });
       })
     }
   },

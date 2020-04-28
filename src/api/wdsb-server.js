@@ -3,7 +3,7 @@ import { fetch } from '@/apiconfig/index'
 const wdsbServer = {
   // 我的设备列表
   myDev (params) {
-    return fetch('task/my_dev/', 'get', params)
+    return fetch('task/dev/', 'get', params)
   },
   // 设备新增分组
   putDev (url, params) {
@@ -11,7 +11,7 @@ const wdsbServer = {
   },
   // 删除任务
   deleteDev (url, params) {
-    return fetch(url, 'delete', params)
+    return fetch(url, 'put', params)
   },
   // 暂停任务
   suspendDev (url, params) {

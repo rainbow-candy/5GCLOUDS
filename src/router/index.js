@@ -23,17 +23,12 @@ const routes = [
     path: '/login',
     component: Login,
     beforeEnter: (to, from, next) => {
-      var userInfo = window.localStorage.getItem('token');
+      const userInfo = window.sessionStorage.getItem('token');
       if (userInfo) {
         next('/home')
       } else {
         next();
       }
-      // if (App.getToken()) {
-      //   next('/home')
-      // } else {
-      //   next()
-      // }
     }
   },
   {
@@ -42,55 +37,89 @@ const routes = [
   },
   {
     path: '/home',
-    component: Main
+    component: Main,
+    meta: {
+      requireAuth: true
+    }
   },
   {
     path: '/dymain',
-    component: Dymain
+    component: Dymain,
+    meta: {
+      requireAuth: true
+    }
   },
   {
     path: '/ksmain',
-    component: Ksmain
+    component: Ksmain,
+    meta: {
+      requireAuth: true
+    }
   },
   {
     path: '/equipment',
-    component: Wdsb
+    component: Wdsb,
+    meta: {
+      requireAuth: true
+    }
   },
   {
     path: '/ksPublishTask',
-    component: Ksfbrw
+    component: Ksfbrw,
+    meta: {
+      requireAuth: true
+    }
   },
   {
     path: '/publishTask',
-    component: Fbrw
+    component: Fbrw,
+    meta: {
+      requireAuth: true
+    }
   },
   {
     path: '/publishTask2',
-    component: Fbrw2
+    component: Fbrw2,
+    meta: {
+      requireAuth: true
+    }
   },
   {
     path: '/keyWord',
-    component: Gjcss
+    component: Gjcss,
+    meta: {
+      requireAuth: true
+    }
   },
   {
     path: '/checkTask',
-    component: Ckrw
+    component: Ckrw,
+    meta: {
+      requireAuth: true
+    }
   },
   {
     path: '/feedback',
-    component: Xxfk
+    component: Xxfk,
+    meta: {
+      requireAuth: true
+    }
   },
   {
     path: '/account',
-    component: Zhxx
+    component: Zhxx,
+    meta: {
+      requireAuth: true
+    }
   },
   {
     path: '**',
-    redirect: '/home'
+    redirect: '/login'
   }
 ]
 
 const router = new VueRouter({
+  scrollBehavior: () => ({ x: 0, y: 0 }),
   routes
 })
 
@@ -98,11 +127,30 @@ const router = new VueRouter({
 //   // to 将要访问的路径
 //   // from 从哪个路径跳转过来
 //   // next 函数 表示放行
-//   if (to.path === '/login') return next()
+//   // if (to.path === '/login') return next()
 //   const tokenStr = window.localStorage.getItem('token');
-//   alert(tokenStr);
-//   if (!tokenStr) return next()
+//   // alert(tokenStr);
+//   if (!tokenStr) return next('/login')
 //   next('/home')
 // })
 
+router.beforeEach((to, from, next) => {
+  // 判断该路由是否需要登录权限
+  if (to.matched.some(record => record.meta.requireAuth)) {
+    // 判断当前的token是否存在 ； 登录存入的token
+    if (window.sessionStorage.getItem('token')) {
+      next();
+    } else {
+      // next('/login')
+      // console.log(this.$router.query);
+      // next(to.fullPath);
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath }
+      })
+    }
+  } else {
+    next();
+  }
+});
 export default router

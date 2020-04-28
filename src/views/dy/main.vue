@@ -8,27 +8,26 @@
       <div>
         <img src="@/assets/imgs/wdsb.png" alt class="ks" @click="wdsb" />
         <img src="@/assets/imgs/fbrw.png" alt class="dy" @click="fbrw" />
-        <el-popover
-          placement="top"
-          title="提示"
-          width="200"
-          trigger="manual"
-          content="关键词搜索功能正在开发中。"
-          v-model="gjcssVisible">
-          <img src="@/assets/imgs/gjcss.png" alt class="dy" @click="gjcssVisible = !gjcssVisible" slot="reference"/>
-        </el-popover>
-        <!-- <img src="@/assets/imgs/gjcss.png" alt class="dy" @click="gjcss"/> -->
+        <img src="@/assets/imgs/rwlb.png" alt class="dy" @click="ckrw" />
       </div>
       <div>
-        <img src="@/assets/imgs/ckrw.png" alt class="ks" @click="ckrw" />
-        <img src="@/assets/imgs/xxfk.png" alt class="dy" @click="xxfk" />
         <el-popover
           placement="bottom"
           title="提示"
-          width="200"
-          trigger="manual"
-          content="账号信息功能正在开发中。"
-          v-model="zhxxVisible">
+          width="270"
+          trigger="hover"
+          content="升级版将在5月正式上线......"
+          v-model="gjcssVisible">
+          <img src="@/assets/imgs/gjcss.png" alt class="ks" @click="gjcssVisible = !gjcssVisible" slot="reference"/>
+        </el-popover>
+        <!-- <img src="@/assets/imgs/gjcss.png" alt class="ks" @click="gjcss"/> -->
+        <img src="@/assets/imgs/khfk.png" alt class="dy" @click="xxfk" />
+        <el-popover
+          placement="bottom"
+          title="提示"
+          width="270"
+          trigger="hover"
+          content="升级版将在5月正式上线......">
           <img src="@/assets/imgs/zhxx.png" alt class="dy" @click="zhxxVisible = !zhxxVisible"  slot="reference"/>
         </el-popover>
         <!-- <img src="@/assets/imgs/zhxx.png" alt class="dy" @click="zhxx" /> -->

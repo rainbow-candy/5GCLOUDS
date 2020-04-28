@@ -1,6 +1,14 @@
 <template>
   <el-dialog title="组别昵称" :visible.sync="dialogVisible" width="30%">
-    <el-input v-model="group"  placeholder="请输入组别昵称" maxlength="6" show-word-limit></el-input>
+    <!-- <el-input v-model="group"  placeholder="请输入组别昵称" maxlength="6" show-word-limit></el-input> -->
+    <el-select v-model="group" placeholder="请选择组别昵称">
+      <el-option
+        v-for="item in options"
+        :key="item.value"
+        :label="item.label"
+        :value="item.value">
+      </el-option>
+    </el-select>
     <span slot="footer" class="dialog-footer">
       <el-button @click="dialogVisible = false">取 消</el-button>
       <el-button type="primary" @click="submit">确 定</el-button>
@@ -17,7 +25,32 @@ export default {
     return {
       dialogVisible: false,
       group: '',
-      checkList: []
+      checkList: [],
+      options: [{
+        value: '推荐点赞',
+        label: '推荐点赞'
+      }, {
+        value: '同城点赞',
+        label: '同城点赞'
+      }, {
+        value: '搜索关注',
+        label: '搜索关注'
+      }, {
+        value: '粉丝关注',
+        label: '粉丝关注'
+      }, {
+        value: '转发评论',
+        label: '转发评论'
+      }, {
+        value: '指定转发评论',
+        label: '指定转发评论'
+      }, {
+        value: '直播助力',
+        label: '直播助力'
+      }, {
+        value: '上传视频',
+        label: '上传视频'
+      }]
     }
   },
   methods: {
@@ -35,7 +68,6 @@ export default {
         return;
       }
       const params = {
-        bulk: '1',
         id: '',
         group: this.group
       }
@@ -49,7 +81,7 @@ export default {
         // 单独修改的接口
         params.id = this.checkList[0].id;
       }
-      const url = 'task/my_dev/' + params.id + '/';
+      const url = 'task/dev/' + params.id + '/';
       wdsbServer.putDev(url, params).then(res => {
         if (res.status === 200) {
           this.dialogVisible = false;
@@ -74,6 +106,9 @@ export default {
     /deep/ .el-dialog__close {
         color: #fff;
     }
+}
+/deep/ .el-select {
+  width: 100%;
 }
 /deep/ .el-button--primary {
     background-color: #e68048;
