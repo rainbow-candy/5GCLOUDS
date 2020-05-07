@@ -6,16 +6,16 @@ const wdsbServer = {
     return fetch('task/dev/', 'get', params)
   },
   // 设备新增分组
-  putDev (url, params) {
-    return fetch(url, 'put', params)
+  putDev (params) {
+    return fetch('task/dev/', 'post', params)
   },
   // 删除任务
-  deleteDev (url, params) {
-    return fetch(url, 'put', params)
+  deleteDev (params) {
+    return fetch('task/dev/', 'post', params)
   },
   // 暂停任务
-  suspendDev (url, params) {
-    return fetch(url, 'put', params)
+  suspendDev (params) {
+    return fetch('task/dev/', 'post', params)
   },
   // 信息反馈
   feedback (params) {

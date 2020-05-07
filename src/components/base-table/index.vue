@@ -15,12 +15,15 @@
     :tree-props="treeProps"
     row-key="id"
     highlight-current-row
+    @select="select"
+    :row-style="{ height:'47px' }"
+    :cell-style="{padding:'0px'}"
   >
     <el-table-column
       v-if="selection"
-      label="全选"
-      width="50"
+      width="42"
       type="selection"
+      :reserve-selection="true"
     ></el-table-column>
     <el-table-column
       v-if="order"
@@ -47,7 +50,8 @@
             </el-button>
           </template>
           <template v-if="item.backColor">
-            <div v-bind:class="[ formatData(item, row) === '正在执行' ? 'backColor1' : 'backColor2'  ]">
+            <div  v-bind:class="[ {'backColor0': formatData(item, row) === '执行成功'}, {'backColor1': formatData(item, row) === '正在执行'}, {'backColor2': formatData(item, row) === '未执行'}, {'backColor3': formatData(item, row) === '执行失败'}  ]">
+            <!-- <div  v-bind:class="[ formatData(item, row) === '正在执行' ? 'backColor1' : 'backColor2'  ]"> -->
               {{formatData(item, row)}}
             </div>
           </template>
@@ -80,7 +84,6 @@
         align="center"
       ></el-table-column>
     </template>
-
     <slot></slot>
   </el-table>
 </template>
@@ -191,6 +194,20 @@ export default {
       this.$refs.elTable.setCurrentRow(row);
     },
 
+    // 勾选复选框
+    select (selection, row) {
+      this.$emit('select', selection, row)
+    },
+
+    // 勾选
+    toggleSelection (row, state) {
+      if (row) {
+        this.$refs.elTable.toggleRowSelection(row, state);
+      } else {
+        this.$refs.elTable.clearSelection();
+      }
+    },
+
     // 清空勾选
     clearSelection () {
       this.$refs.elTable.clearSelection();
@@ -236,11 +253,17 @@ export default {
       }
     }
   }
+  .backColor0 {
+    background-color: #52b7da;
+  }
   .backColor1 {
     background-color:#82B745;
   }
   .backColor2 {
     background-color:#ccc;
+  }
+  .backColor3 {
+    background-color: #e06262;
   }
 }
 </style>

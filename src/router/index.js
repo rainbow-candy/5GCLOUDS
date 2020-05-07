@@ -5,7 +5,8 @@ import Main from '../views/main-page.vue'
 import Dymain from '../views/dy/main.vue'
 import Wdsb from '../views/dy/wdsb.vue'
 import Fbrw from '../views/dy/fbrw.vue'
-import Fbrw2 from '../views/dy/fbrw2.vue'
+// import Fbrw2 from '../views/dy/fbrw2.vue'
+import FbrwBf from '../views/dy/fbrw3.vue'
 import Gjcss from '../views/dy/gjcss.vue'
 import Ckrw from '../views/dy/ckrw.vue'
 import Xxfk from '../views/dy/xxfk.vue'
@@ -77,12 +78,16 @@ const routes = [
       requireAuth: true
     }
   },
+  // {
+  //   path: '/publishTask2',
+  //   component: Fbrw2,
+  //   meta: {
+  //     requireAuth: true
+  //   }
+  // },
   {
     path: '/publishTask2',
-    component: Fbrw2,
-    meta: {
-      requireAuth: true
-    }
+    component: FbrwBf
   },
   {
     path: '/keyWord',

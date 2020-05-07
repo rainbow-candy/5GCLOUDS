@@ -3,7 +3,7 @@
     <div>
       <img src="@/assets/imgs/title-fbrw.png" alt class="content-title"/>
       <img src="@/assets/imgs/newlogo.png" alt style="width: 50px;position: absolute;right: 170px;top: 20px;"/>
-      <div class="to-home" @click="toHome" title="返回抖音首页"><i class="el-icon-s-home"></i>返回抖音首页</div>
+      <div class="to-home" @click="toHome"><i class="el-icon-refresh-left"></i>返回上级</div>
       <img src="@/assets/imgs/dy-logo.png" alt="" class="logo">
     </div>
     <div class="content">

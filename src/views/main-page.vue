@@ -23,7 +23,7 @@
         <img src="@/assets/imgs/dy-btn.png" alt class="dy" @click="toDY" />
       </div>
     </div>
-    <div>vip服务时间截止为2020-02-12</div>
+    <div class="deadline">VIP服务截止时间2020-02-12</div>
   </div>
 </template>
 

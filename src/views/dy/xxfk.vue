@@ -3,7 +3,7 @@
     <div>
       <img src="@/assets/imgs/title-khfk.png" alt class="content-title"/>
       <div class="to-home" @click="toHome">
-        <div v-if="this.$route.query.type === 'dy'"><i class="el-icon-s-home"></i>返回抖音首页</div>
+        <div v-if="this.$route.query.type === 'dy'"><i class="el-icon-refresh-left"></i>返回上级</div>
         <div v-if="this.$route.query.type !== 'dy'"><i class="el-icon-s-home"></i>返回快手首页</div>
       </div>
       <img src="@/assets/imgs/newlogo.png" alt style="width: 50px;position: absolute;right: 170px;top: 20px;"/>
@@ -21,7 +21,7 @@
         >
           <el-input v-model="form.email_user"></el-input>
         </el-form-item> -->
-        <div style="text-align: center;"><el-button @click="submit">执行</el-button></div>
+        <div style="text-align: center;"><el-button @click="submit">提交</el-button></div>
       </el-form>
     </div>
   </div>
@@ -59,8 +59,9 @@ export default {
               // this.$alert('感谢您的帮助与支持！', '反馈成功', {
               //   confirmButtonText: '确定'
               // });
-              this.$alert('<h2>感谢您的帮助与支持!</h2>', '反馈成功', {
-                dangerouslyUseHTMLString: true
+              this.$alert('<h3>感谢您的帮助与支持!</h3>', '反馈成功', {
+                dangerouslyUseHTMLString: true,
+                center: true
               });
             }
           })

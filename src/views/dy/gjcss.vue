@@ -4,7 +4,7 @@
     <img src="@/assets/imgs/title-sjfx.png" alt class="content-title" v-show="!isActive"/>
     <div>
       <div class="to-home" @click="toHome">
-        <div v-if="this.$route.query.type === 'dy'"><i class="el-icon-s-home"></i>返回抖音首页</div>
+        <div v-if="this.$route.query.type === 'dy'"><i class="el-icon-refresh-left"></i>返回上级</div>
         <div v-if="this.$route.query.type !== 'dy'"><i class="el-icon-s-home"></i>返回快手首页</div>
       </div>
       <img src="@/assets/imgs/newlogo.png" alt style="width: 50px;position: absolute;right: 170px;top: 20px;"/>
@@ -21,10 +21,6 @@
       <!-- 关键词摘取 -->
       <div v-show="isActive" class="gjcForm">
         <el-form label-position="left" label-width="100px" :model="form">
-          <el-form-item label="选择设备：">
-            <i class="el-icon-plus" @click="xzsb"></i>
-            <base-table :columns="sbColumns" :data="tableData" selection v-show="sbShow"></base-table>
-          </el-form-item>
           <el-form-item label="关键词：">
             <el-input v-model="form.name"></el-input>
           </el-form-item>
@@ -37,6 +33,10 @@
                 :value="item.value">
               </el-option>
             </el-select>
+          </el-form-item>
+          <el-form-item label="选择设备：">
+            <i class="el-icon-plus" @click="xzsb"></i>
+            <base-table :columns="sbColumns" :data="tableData" selection v-show="sbShow"></base-table>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="onSubmit">执行</el-button>

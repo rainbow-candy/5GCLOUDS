@@ -1,33 +1,22 @@
 <template>
-  <el-dialog title="组别昵称" :visible.sync="dialogVisible" width="800px">
-    <!-- <el-input v-model="group"  placeholder="请输入组别昵称" maxlength="6" show-word-limit></el-input> -->
+  <el-dialog title="同步" :visible.sync="dialogVisible" width="800px">
     <el-form label-width="100px">
-      <el-form-item label="组别昵称：">
-        <el-select v-model="group" placeholder="请选择组别昵称">
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
-      </el-form-item>
       <el-form-item label="选择设备：">
-        <div style="height: 320px">
-          <base-table ref="sbTable" :columns="sbColumns" :data="tableData" selection height="340" @selection-change="selectionRow"
-          ></base-table>
-          <el-pagination
-            class="sp-pagenation"
+        <div style="height: 400px">
+          <base-table ref="sbTable" :columns="sbColumns" :data="tableData" selection height="380" @selection-change="selectionRow"
+            ></base-table>
+            <el-pagination
+            class="xzyh-pagenation"
             @current-change="handleCurrentChange"
             layout="prev, pager, next, total"
             :total="total"
             :current-page="current"
-          ></el-pagination>
+            ></el-pagination>
         </div>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
-      <el-button @click="dialogVisible = false">取 消</el-button>
+      <el-button @click="cancel">取 消</el-button>
       <el-button type="primary" @click="submit">确 定</el-button>
     </span>
   </el-dialog>
@@ -37,39 +26,13 @@
 import wdsbServer from '@/api/wdsb-server.js';
 
 export default {
-  name: 'addGroup',
+  name: 'forwardModal',
   data () {
     return {
       total: 50,
       current: 1,
       dialogVisible: false,
-      group: '',
       checkList: [],
-      options: [{
-        value: '推荐点赞',
-        label: '推荐点赞'
-      }, {
-        value: '同城点赞',
-        label: '同城点赞'
-      }, {
-        value: '搜索关注',
-        label: '搜索关注'
-      }, {
-        value: '粉丝关注',
-        label: '粉丝关注'
-      }, {
-        value: '转发评论',
-        label: '转发评论'
-      }, {
-        value: '指定转发评论',
-        label: '指定转发评论'
-      }, {
-        value: '直播助力',
-        label: '直播助力'
-      }, {
-        value: '上传视频',
-        label: '上传视频'
-      }],
       sbColumns: [
         {
           prop: 'name',
@@ -79,8 +42,7 @@ export default {
           prop: 'group',
           label: '组别（可筛选）',
           filter: true,
-          filterData: [],
-          width: 200
+          filterData: []
         }
       ],
       tableData: [],
@@ -88,10 +50,9 @@ export default {
     }
   },
   methods: {
-    open (data, tableData) {
+    open () {
       this.current = 1;
       this.dialogVisible = true;
-      this.group = '';
       this.getList(this.current);
     },
     // 表格复选框选中
@@ -104,45 +65,37 @@ export default {
       this.getList(val);
     },
     submit () {
-      if (this.group === '') {
-        this.$message({
-          type: 'warning',
-          message: '请输入组别昵称！'
-        });
-        return;
-      }
       if (this.checkList.length === 0) {
         this.$message({
           type: 'warning',
-          message: '请选择设备！'
+          message: '请勾选用户！'
         });
         return;
       }
       const params = {
         id_list: '',
-        group: this.group,
-        bulk: 1
+        bulk: 1,
+        synchronize: 1
       }
-      if (this.checkList.length > 1) {
-        // 批量修改的接口
-        this.checkList.forEach(t => {
-          params.id_list += t.id + ','
-        });
-        params.id_list = params.id_list.substr(0, params.id_list.length - 1);
-      } else {
-        // 单独修改的接口
-        params.id_list = this.checkList[0].id;
-      }
+      this.checkList.forEach(t => {
+        params.id_list += t.id + ','
+      });
+      params.id_list = params.id_list.substr(0, params.id_list.length - 1);
       wdsbServer.putDev(params).then(res => {
         if (res.status === 200) {
           this.dialogVisible = false;
           this.$message({
-            message: '分组新增成功！',
+            message: res.data.msg,
             type: 'success'
           });
           this.$parent.getList();
         }
       })
+    },
+    // 取消
+    cancel () {
+      this.dialogVisible = false;
+      this.$parent.zbjzf(0);
     },
     // 重新勾选
     reSelect () {
@@ -219,17 +172,7 @@ export default {
     background-color: #e68048;
     border-color: #e68048;
 }
-.el-icon-plus {
-    height: 30px;
-    line-height: 30px;
-    width: 30px;
-    text-align: center;
-    border-radius: 7px;
-    background-color: #e68048;
-    color: #fff;
-    cursor: pointer;
-}
-/deep/ .el-pagination {
-  bottom: -75px;
+.xzyh-pagenation {
+    bottom: -50px;
 }
 </style>

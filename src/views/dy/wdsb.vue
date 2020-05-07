@@ -4,7 +4,7 @@
       <img src="@/assets/imgs/title-wdsb.png" alt class="content-title"/>
       <div class="to-home" @click="toHome">
         <div v-if="this.$route.query.type === 'dy'">
-          <i class="el-icon-s-home"></i>返回抖音首页
+          <i class="el-icon-refresh-left"></i>返回上级
         </div>
         <div v-if="this.$route.query.type !== 'dy'">
           <i class="el-icon-s-home"></i>返回快手首页
@@ -16,14 +16,21 @@
     </div>
     <div class="content">
       <div class="btn">
-        <el-button class="add-btn" @click="grouping" :disabled="selectTableRow.length === 0">
+        <el-button class="add-btn" @click="grouping">
           <i class="el-icon-plus"></i>分组
         </el-button>
-        <el-button class="refresh-btn" @click="getList">
+        <el-button class="refresh-btn" @click="getList(val)">
           <i class="el-icon-refresh"></i>刷新
         </el-button>
       </div>
-      <base-table :columns="tableColumns" :data="tableData" selection height="462" @selection-change="selectionRow"></base-table>
+      <base-table :columns="tableColumns" :data="tableData" height="525" @selection-change="selectionRow"></base-table>
+      <el-pagination
+        class="sp-pagenation"
+        @current-change="handleCurrentChange"
+        layout="prev, pager, next, total, jumper"
+        :total="total"
+      >
+      </el-pagination>
     </div>
     <addGroup ref="addGroup"></addGroup>
   </div>
@@ -37,6 +44,7 @@ export default {
   components: { addGroup },
   data () {
     return {
+      total: 0,
       tableColumns: [
         {
           prop: 'name',
@@ -66,12 +74,17 @@ export default {
         }
       ],
       tableData: [],
-      selectTableRow: []
+      selectTableRow: [],
+      val: 1
     }
   },
   methods: {
+    handleCurrentChange (val) {
+      this.getList(val);
+      this.val = val;
+    },
     grouping () {
-      this.$refs.addGroup.open(this.selectTableRow)
+      this.$refs.addGroup.open(this.selectTableRow, this.tableData)
     },
     toHome () {
       this.$router.go(-1)
@@ -105,25 +118,37 @@ export default {
         )
       })
     },
-    getList () {
+    getList (page) {
       this.tableData = [];
       const _this = this;
-      wdsbServer.myDev().then(res => {
+      wdsbServer.myDev({ mydev: 1, page: page }).then(res => {
         if (res.status === 200) {
-          res.data.forEach((t) => {
-            if (t.stats === 1) {
-              t.stats = '正在执行';
-            } else {
-              t.stats = '未执行';
-            }
-            if (t.online === 1) {
-              t.online = '在线';
-            } else {
-              t.online = '离线';
-            }
-          });
-          this.tableData = res.data;
-          this.getFilterData(this.tableData);
+          if (res.data.results.length > 0) {
+            const datas = res.data.results;
+            this.total = res.data.count;
+            datas.forEach((t) => {
+              switch (t.stats) {
+                case 0:
+                  t.stats = '未执行';
+                  break;
+                case 1:
+                  t.stats = '正在执行';
+                  break;
+                case 2:
+                  t.stats = '执行失败';
+                  break;
+                default:
+                  t.stats = '执行成功';
+              }
+              if (t.online === 1) {
+                t.online = '在线';
+              } else {
+                t.online = '离线';
+              }
+            });
+            this.tableData = datas;
+            this.getFilterData(this.tableData);
+          }
         }
       }, function () {
         _this.$message({
@@ -135,6 +160,9 @@ export default {
   },
   mounted () {
     this.getList();
+    // window.setInterval(() => {
+    //   setTimeout(this.getList(), 0);
+    // }, 1000);
   }
 }
 </script>
@@ -183,5 +211,8 @@ export default {
     border-color: #e68048;
     background-color: #e68048;
   }
+}
+/deep/ .is-center {
+  height: 47px;
 }
 </style>

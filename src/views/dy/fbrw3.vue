@@ -17,46 +17,52 @@
       <img src="@/assets/imgs/ks-logo.png" alt class="logo" v-if="this.$route.query.type !== 'dy'" />
     </div>
     <div class="search_str">
-      <el-form label-position="right" :model="ruleForm" label-width="170px" :rules="rules" ref="ruleForm">
-        <el-form-item label="选择设备：">
+      <el-form label-position="right" :model="ruleForm" label-width="170px" :rules="rules" ref="ruleForm" style="width: 650px;" class="ruleForm">
+        <div class="required">*</div><el-form-item label="选择设备：">
           <i class="el-icon-plus" @click="xzsb"></i>
-          <base-table :columns="sbColumns" :data="tableData" selection v-show="sbShow" height="182" @selection-change="selectionRow"></base-table>
+          <!-- <base-table :columns="sbColumns" :data="tableData" selection v-show="sbShow" height="182" @selection-change="selectionRow"></base-table> -->
         </el-form-item>
-        <el-form-item label="点赞数量：" v-if="this.$route.query.name === '推荐点赞' || this.$route.query.name === '同城点赞'">
-          <el-input-number v-model="to_num" controls-position="right" :min="1" label="请输入点赞数量"></el-input-number>
+        <el-form-item label="点赞数量：" v-if="this.$route.query.name === '推荐点赞' || this.$route.query.name === '同城点赞'" prop="to_num">
+          <el-input-number v-model="ruleForm.to_num" controls-position="right" :min="1" label="请输入点赞数量"></el-input-number>
         </el-form-item>
-        <el-form-item label="搜索内容（大类）：" v-if="this.$route.query.name === '转发评论' || this.$route.query.name === '搜索关注'">
-          <el-input type="text" v-model="search_str" minlength="1" placeholder="请输入搜索内容"></el-input>
+        <el-form-item label="搜索内容（大类）：" v-if="this.$route.query.name === '转发评论' || this.$route.query.name === '搜索关注'" prop="search_str">
+          <el-input type="text" v-model="ruleForm.search_str" minlength="1" placeholder="请输入搜索内容"></el-input>
         </el-form-item>
-        <el-form-item label="搜索抖音ID号：" v-if="this.$route.query.name === '指定转发评论' || this.$route.query.name === '粉丝关注'">
-          <el-input type="text" v-model="search_str" minlength="1" maxlength="15" show-word-limit placeholder="请输入抖音ID号"></el-input>
+        <el-form-item label="搜索抖音ID号：" v-if="this.$route.query.name === '指定转发评论' || this.$route.query.name === '粉丝关注'" prop="search_str">
+          <el-input type="text" v-model="ruleForm.search_str" minlength="1" maxlength="15" show-word-limit placeholder="请输入抖音ID号"></el-input>
         </el-form-item>
         <el-form-item label="评论内容：" v-if="this.$route.query.name === '推荐点赞' || this.$route.query.name === '同城点赞'">
-          <el-input type="textarea" v-model="content" :rows="3" :maxlength="maxlength" show-word-limit placeholder="评论条数以“|”分隔" @input="plnrChange"></el-input>
+          <el-input type="textarea" v-model="ruleForm.content" :rows="4" :maxlength="maxlength" show-word-limit placeholder="评论条数以“|”分隔" @input="plnrChange"></el-input>
         </el-form-item>
-        <el-form-item label="关注数量：" v-if="this.$route.query.name === '搜索关注' || this.$route.query.name === '粉丝关注'">
-          <el-input-number v-model="to_num" controls-position="right" :min="1" label="请输入关注数量"></el-input-number>
+        <el-form-item label="关注数量：" v-if="this.$route.query.name === '搜索关注' || this.$route.query.name === '粉丝关注'" prop="to_num">
+          <el-input-number v-model="ruleForm.to_num" controls-position="right" :min="1" label="请输入关注数量"></el-input-number>
           <!-- <el-input type="number" v-model="to_num"></el-input> -->
         </el-form-item>
         <el-form-item label="私信内容：" v-if="this.$route.query.name === '搜索关注' || this.$route.query.name === '粉丝关注'">
-          <el-input type="textarea" v-model="content" :rows="3" placeholder="请输入私信内容"></el-input>
+          <el-input type="textarea" v-model="ruleForm.content" :rows="3" placeholder="请输入私信内容"></el-input>
         </el-form-item>
         <!-- <el-form-item label="选择素材：" v-if="this.$route.query.name === '上传视频'">
           <i class="el-icon-plus" @click="xzsc"></i>
         </el-form-item> -->
         <div v-if="this.$route.query.name.indexOf('转发评论') !== -1">
-          <el-form-item label="转发数量：">
-            <el-input-number v-model="to_num" controls-position="right" :min="1" label="请输入转发数量"></el-input-number>
+          <el-form-item label="转发数量：" prop="to_num">
+            <el-input-number v-model="ruleForm.to_num" controls-position="right" :min="1" label="请输入转发数量"></el-input-number>
           </el-form-item>
-          <el-form-item label="评论(@昵称)：">
-            <el-input type="textarea" v-model="content" :rows="3" maxlength="100" show-word-limit placeholder="输入网红昵称即可"></el-input>
+          <el-form-item label="评论(@抖音号)：">
+            <el-input type="textarea" v-model="ruleForm.content" :rows="3" maxlength="100" show-word-limit placeholder="输入网红抖音号即可"></el-input>
           </el-form-item>
         </div>
         <!-- 直播助力 -->
         <div v-if="this.$route.query.name === '直播助力'">
-          <el-form-item label="直播间号：">
-            <el-input type="text" v-model="search_str" placeholder="请输入直播间号"></el-input>
+          <el-form-item label="直播间号：" prop="search_str">
+            <el-input type="text" v-model="ruleForm.search_str" placeholder="请输入直播间号"></el-input>
           </el-form-item>
+          <div class="required" style="left: 60px;">*</div><el-form-item label="直播间转发：">
+          <div class="zxfs" style="display: flex;">
+            <div :class="{ active: isActives }" @click="zbjzf('0')">否</div>
+            <div :class="{ active: !isActives }" @click="zbjzf('1')">是</div>
+          </div>
+        </el-form-item>
           <el-form-item label="弹幕文案：">
             <el-upload
               class="upload-demo"
@@ -68,30 +74,27 @@
               show-file-list
               :auto-upload="false"
               :on-exceed="handleExceed"
-              accept=".txt"
+              accept=".xls, .xlsx"
               :file-list="fileList">
-              <div class="djsc">选择txt文件</div>
+              <div class="djsc">选择excel文件</div>
             </el-upload>
           </el-form-item>
-          <el-form-item label="观看时间：">
-            <el-input-number v-model="to_num" controls-position="right" :min="5" :max="240" label="请输入观看时间"></el-input-number>
+          <el-form-item label="观看时间："  prop="to_num">
+            <el-input-number v-model="ruleForm.to_num" controls-position="right" :min="5" :max="240" label="请输入观看时间"></el-input-number>
           </el-form-item>
         </div>
         <!-- 上传视频 -->
         <div v-if="this.$route.query.name === '上传视频'">
-          <el-form-item label="视频文本：">
-            <el-input v-model="spwb" maxlength="30" show-word-limit placeholder="请输入视频文本"></el-input>
+          <el-form-item label="视频文本：" prop="spwb">
+            <el-input v-model="ruleForm.spwb" maxlength="30" show-word-limit placeholder="请输入视频文本"></el-input>
           </el-form-item>
           <el-form-item label="#话题：">
-            <el-input v-model="spht" maxlength="10" show-word-limit @input="htKeyup" placeholder="禁止输入特殊字符和空格"></el-input>
+            <el-input v-model="ruleForm.spht" maxlength="10" show-word-limit @input="htKeyup" placeholder="禁止输入特殊字符和空格"></el-input>
           </el-form-item>
           <el-form-item label="@好友：">
-            <el-input v-model="sphy" maxlength="10" show-word-limit @input="hyKeyup" placeholder="禁止输入特殊字符和空格"></el-input>
+            <el-input v-model="ruleForm.sphy" maxlength="10" show-word-limit @input="hyKeyup" placeholder="禁止输入特殊字符和空格"></el-input>
           </el-form-item>
-          <!-- <el-form-item label="定位：">
-            <el-input v-model="sphy" maxlength="10" show-word-limit @input="hyKeyup" placeholder="禁止输入特殊字符和空格"></el-input>
-          </el-form-item> -->
-          <el-form-item label="视频素材：">
+          <div class="required">*</div><el-form-item label="视频素材：">
             <el-upload
               class="upload-demo"
               action="http://112.74.103.26/api/task/dev/"
@@ -103,13 +106,12 @@
               :auto-upload="false"
               :on-exceed="handleExceed"
               :file-list="fileList">
-              <div class="djsc">选择文件</div>
-              <div class="el-upload__tip" slot="tip">文件最大50M</div>
+              <div class="djsc">选择文件（文件最大50M）</div>
             </el-upload>
           </el-form-item>
         </div>
         <!-- 执行方式 -->
-        <el-form-item label="执行方式：">
+        <div class="required">*</div><el-form-item label="执行方式：">
           <div class="zxfs" style="display: flex;">
             <div :class="{ active: isActive }" @click="implement('0')">立即执行</div>
             <div :class="{ active: !isActive }" @click="implement('1')">定时执行</div>
@@ -117,7 +119,7 @@
         </el-form-item>
         <el-form-item label="">
           <el-date-picker
-            v-model="time"
+            v-model="ruleForm.time"
             v-show="timing"
             type="datetime"
             :picker-options="pickerOptions"
@@ -128,35 +130,46 @@
           <el-button class="zxBtn" @click="onSubmit" :disabled="selectTableRow.length === 0">执行</el-button>
         </el-form-item>
       </el-form>
+      <div style="position: relative;height: 468px;border-left:1px solid #ccc;" v-show="sbShow">
+        <base-table :columns="sbColumns" :data="tableData" selection height="420" @selection-change="selectionRow" style="max-width: 550px;margin-left: 70px;"></base-table>
+        <el-pagination
+          class="fbrw-pagenation"
+          @current-change="handleCurrentChange"
+          layout="prev, pager, next, total, jumper"
+          :total="total"
+        ></el-pagination>
+      </div>
     </div>
     <xzscModal ref="xzscModal"></xzscModal>
+    <forwardModal ref="forwardModal"></forwardModal>
   </div>
 </template>
 
 <script>
 import wdsbServer from '@/api/wdsb-server.js';
 import xzscModal from '@/modal/xzscModal';
+import forwardModal from '@/modal/forward';
 
 export default {
-  components: { xzscModal },
+  components: { xzscModal, forwardModal },
   data () {
     return {
       sbShow: false,
       isActive: true,
+      isActives: true,
       timing: false,
-      num: '0',
-      time: '',
-      search_str: '',
-      to_num: '',
-      content: '',
-      name: '',
-      spwb: '',
-      spht: '',
-      sphy: '',
+      ruleForm: {
+        time: '',
+        search_str: '',
+        to_num: '',
+        content: '',
+        spwb: '',
+        spht: '',
+        sphy: ''
+      },
       fileList: [],
       toFileList: [],
       // 表单必填校验
-      ruleForm: {},
       rules: {
         to_num: { required: true, message: '必填', trigger: 'blur' },
         spwb: { required: true, message: '必填', trigger: 'blur' },
@@ -176,11 +189,18 @@ export default {
           label: '组别（可筛选）',
           filter: true,
           filterData: [],
-          width: 150
+          width: 180
+        },
+        {
+          prop: 'stats',
+          label: '工作状态',
+          sortable: true,
+          backColor: true
         }
       ],
       tableData: [],
       selectTableRow: [],
+      total: 0,
       pickerOptions: {
         disabledDate (time) {
           return time.getTime() < Date.now() - 8.64e7;
@@ -232,28 +252,40 @@ export default {
         this.timing = !this.timing;
       }
     },
-    onSubmit () {
-      // var activeObj = new ActiveXObject('WScript.shell');
-      // // var para = "C:\\Program Files\\Tencent\\TT\\bin\\TTraveler.exe";
-      // var para = "G:\Blex_exe\dist\粉丝关注.exe";
-      // activeObj.exec(para);
-      if (this.time) {
-        const d = new Date(this.time);
-        const resDate = d.getFullYear() + '-' + this.p((d.getMonth() + 1)) + '-' + this.p(d.getDate())
-        const resTime = this.p(d.getHours()) + ':' + this.p(d.getMinutes()) + ':' + this.p(d.getSeconds())
-        this.task_time = resDate + ' ' + resTime;
-        if (this.$route.query.name === '上传视频' || this.$route.query.name === '直播助力') {
-          this.submit(this.task_time);
-        } else {
-          this.ljzx(this.task_time);
-        }
-      } else {
-        if (this.$route.query.name === '上传视频' || this.$route.query.name === '直播助力') {
-          this.submit();
-        } else {
-          this.ljzx();
-        }
+    // 直播间是否转发
+    zbjzf (num) {
+      if (this.num !== num) {
+        this.isActives = !this.isActives
       }
+      this.num = num;
+      if (num === '1') {
+        this.$refs.forwardModal.open();
+      }
+    },
+    onSubmit () {
+      this.$refs.ruleForm.validate((valid) => {
+        if (valid) {
+          if (this.ruleForm.time) {
+            const d = new Date(this.ruleForm.time);
+            const resDate = d.getFullYear() + '-' + this.p((d.getMonth() + 1)) + '-' + this.p(d.getDate())
+            const resTime = this.p(d.getHours()) + ':' + this.p(d.getMinutes()) + ':' + this.p(d.getSeconds())
+            this.ruleForm.task_time = resDate + ' ' + resTime;
+            if (this.$route.query.name === '上传视频' || this.$route.query.name === '直播助力') {
+              this.submit(this.ruleForm.task_time);
+            } else {
+              this.ljzx(this.ruleForm.task_time);
+            }
+          } else {
+            if (this.$route.query.name === '上传视频' || this.$route.query.name === '直播助力') {
+              this.submit();
+            } else {
+              this.ljzx();
+            }
+          }
+        } else {
+          return false;
+        }
+      });
     },
     // 立即执行
     ljzx (time) {
@@ -261,9 +293,10 @@ export default {
         id: '',
         task_nick: this.$route.query.name,
         app_type: this.$route.query.type,
-        to_num: this.to_num,
-        content: this.content,
-        search_str: this.search_str
+        to_num: this.ruleForm.to_num,
+        content: this.ruleForm.content,
+        search_str: this.ruleForm.search_str,
+        bulk: 1
       };
       // 立即执行不需要传task_time
       if (!this.isActive) {
@@ -332,12 +365,32 @@ export default {
         )
       })
     },
-    getList () {
+    // 切换分页
+    handleCurrentChange (val) {
+      this.current = val;
+      this.getList(val);
+    },
+    getList (page) {
       this.tableData = [];
-      wdsbServer.myDev().then(res => {
+      wdsbServer.myDev({ mydev: 1, page: page }).then(res => {
         if (res.status === 200) {
+          res.data.results.forEach((t) => {
+            switch (t.stats) {
+              case 0:
+                t.stats = '未执行';
+                break;
+              case 1:
+                t.stats = '正在执行';
+                break;
+              case 2:
+                t.stats = '执行失败';
+                break;
+              default:
+                t.stats = '执行成功';
+            }
+          });
           this.tableData = res.data.results;
-          console.log(this.tableData);
+          this.total = res.data.count;
           this.getFilterData(this.tableData);
         }
       })
@@ -359,9 +412,7 @@ export default {
     },
     // 上传视频
     submit (time) {
-      if (this.$route.query.name === '上传视频' && this.spwb === '') {
-        this.$message.warning('请输入文本内容')
-      } else if (this.toFileList.length === 0) {
+      if (this.toFileList.length === 0) {
         this.$message.warning('请上传文件')
       } else {
         const params = {
@@ -379,9 +430,7 @@ export default {
         if (this.selectTableRow.length > 1) {
           // 批量修改的接口
           this.selectTableRow.forEach(t => {
-            console.log(t.id, 't.id');
             params.id += t.id + ','
-            console.log(t);
           });
           params.id = params.id.substr(0, params.id.length - 1);
         } else if (this.selectTableRow.length === 1) {
@@ -390,19 +439,20 @@ export default {
         }
         // 拼接content
         if (this.$route.query.name === '上传视频') {
-          this.content = this.spwb + ',,,,,' + this.spht + ',,,,,' + this.sphy;
+          this.ruleForm.content = this.ruleForm.spwb + ',,,,,' + this.ruleForm.spht + ',,,,,' + this.ruleForm.sphy;
         }
         // 观看直播时间
         formData.append('id', params.id);
         formData.append('task_nick', this.$route.query.name);
         formData.append('app_type', this.$route.query.type);
-        formData.append('content', this.content);
+        formData.append('content', this.ruleForm.content);
         if (this.$route.query.name === '直播助力') {
-          formData.append('to_num', this.to_num);
-          formData.append('search_str', this.search_str);
+          formData.append('to_num', this.ruleForm.to_num);
+          formData.append('search_str', this.ruleForm.search_str);
         }
         formData.append('to_file', this.toFileList[0]);
-        const url = 'http://112.74.103.26/api/task/dev/' + params.id + '/';
+        formData.append('bulk', 1);
+        const url = 'http://192.168.1.52:8888/api/task/dev/';
         this.makeXMLHttpRequest(url, formData, this)
       }
     },
@@ -433,13 +483,13 @@ export default {
           }
         }
       };
-      request.open('PUT', url);
+      request.open('POST', url);
       request.setRequestHeader('authorization', window.sessionStorage.getItem('token'));
       request.send(data);
     }
   },
   mounted () {
-    this.getList();
+    this.getList(1);
   }
 }
 </script>
@@ -472,6 +522,7 @@ export default {
 }
 .search_str {
   margin-top: 50px;
+  display: flex;
   .el-icon-plus {
     height: 30px;
     line-height: 30px;
@@ -489,10 +540,12 @@ export default {
     width: 200px;
     margin-left: 100px;
   }
-  /deep/ .el-table, /deep/ .el-input, /deep/.el-textarea {
-    width: 400px;
-    /deep/ .el-input__inner {
-      text-align: left;
+  .ruleForm {
+    /deep/ .el-table, /deep/ .el-input, /deep/.el-textarea {
+      width: 400px;
+      /deep/ .el-input__inner {
+        text-align: left;
+      }
     }
   }
   /deep/ .el-form-item__label {
@@ -527,5 +580,15 @@ export default {
 }
 /deep/ .el-input-number {
   width: 400px;
+}
+.fbrw-pagenation {
+  left: 310px;
+}
+.required {
+  position: relative;
+  left: 73px;
+  top: 27px;
+  color: #f56c7e;
+  font-size: 15px;
 }
 </style>

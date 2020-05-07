@@ -11,7 +11,7 @@
         <img src="@/assets/imgs/rwlb.png" alt class="dy" @click="ckrw" />
       </div>
       <div>
-        <el-popover
+        <!-- <el-popover
           placement="bottom"
           title="提示"
           width="270"
@@ -19,18 +19,18 @@
           content="升级版将在5月正式上线......"
           v-model="gjcssVisible">
           <img src="@/assets/imgs/gjcss.png" alt class="ks" @click="gjcssVisible = !gjcssVisible" slot="reference"/>
-        </el-popover>
-        <!-- <img src="@/assets/imgs/gjcss.png" alt class="ks" @click="gjcss"/> -->
+        </el-popover> -->
+        <img src="@/assets/imgs/gjcss.png" alt class="ks" @click="gjcss"/>
         <img src="@/assets/imgs/khfk.png" alt class="dy" @click="xxfk" />
-        <el-popover
+        <!-- <el-popover
           placement="bottom"
           title="提示"
           width="270"
           trigger="hover"
           content="升级版将在5月正式上线......">
           <img src="@/assets/imgs/zhxx.png" alt class="dy" @click="zhxxVisible = !zhxxVisible"  slot="reference"/>
-        </el-popover>
-        <!-- <img src="@/assets/imgs/zhxx.png" alt class="dy" @click="zhxx" /> -->
+        </el-popover> -->
+        <img src="@/assets/imgs/zhxx.png" alt class="dy" @click="zhxx" />
       </div>
     </div>
   </div>

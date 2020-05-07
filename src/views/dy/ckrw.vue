@@ -3,7 +3,7 @@
     <div>
       <img src="@/assets/imgs/title-rwlb.png" alt class="content-title"/>
       <div class="to-home" @click="toHome">
-        <div v-if="this.$route.query.type === 'dy'"><i class="el-icon-s-home"></i>返回抖音首页</div>
+        <div v-if="this.$route.query.type === 'dy'"><i class="el-icon-refresh-left"></i>返回上级</div>
         <div v-if="this.$route.query.type !== 'dy'"><i class="el-icon-s-home"></i>返回快手首页</div>
       </div>
       <img src="@/assets/imgs/newlogo.png" alt style="width: 50px;position: absolute;right: 170px;top: 20px;"/>
@@ -16,21 +16,28 @@
           <i class="el-icon-warning-outline"></i>取消任务
         </el-button> -->
         <el-button class="add-btn" @click="suspends" :disabled="selectTableRow.length === 0">
-          <i class="el-icon-video-pause"></i>批量暂停
+          <i class="el-icon-video-pause"></i>批量停止
         </el-button>
         <el-button class="refresh-btn" type="danger"  @click="deletes" :disabled="selectTableRow.length === 0">
           <i class="el-icon-delete"></i>批量删除
         </el-button>
       </div>
-      <base-table :columns="tableColumns" :data="tableData" selection height="462" @selection-change="selectionRow">
-        <el-table-column label="操作" width="200">
+      <base-table :columns="tableColumns" :data="tableData" selection height="525" @selection-change="selectionRow">
+        <el-table-column label="操作" width="160">
           <template slot-scope="scope">
-            <el-button type="text" icon="el-icon-video-play" @click="suspendRow(scope.row)" v-if="scope.row.zt === '正在执行'">暂停</el-button>
+            <el-button type="text" icon="el-icon-video-play" @click="suspendRow(scope.row)" v-if="scope.row.zt === '正在执行'">停止</el-button>
             <el-button type="text" icon="el-icon-video-pause" @click="startRow(scope.row)" v-if="scope.row.zt === '未执行'">继续</el-button>
             <el-button type="text" icon="el-icon-delete" @click="deleteRow(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </base-table>
+      <el-pagination
+        class="sp-pagenation"
+        @current-change="handleCurrentChange"
+        layout="prev, pager, next, total, jumper"
+        :total="total"
+      >
+      </el-pagination>
     </div>
   </div>
 </template>
@@ -41,6 +48,8 @@ import wdsbServer from '@/api/wdsb-server.js';
 export default {
   data () {
     return {
+      total: 0,
+      val: 1,
       tableColumns: [
         {
           prop: 'name',
@@ -50,7 +59,8 @@ export default {
           prop: 'group',
           label: '分组（可筛选）',
           filter: true,
-          filterData: []
+          filterData: [],
+          width: 150
         },
         {
           prop: 'task_nick',
@@ -88,9 +98,9 @@ export default {
         this.suspendVideo(row.key, { stop_task: 1 });
       })
     },
-    // 暂停
+    // 停止
     suspendRow (row) {
-      this.$confirm('是否确认暂停?', '提示', {
+      this.$confirm('是否确认停止?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -98,14 +108,14 @@ export default {
         this.suspendVideo(row.key, { stop_task: 0 });
       })
     },
-    // 批量暂停
+    // 批量停止
     suspends () {
       let ids = ''
       this.selectTableRow.forEach(t => {
         ids += t.key + ','
       });
       ids = ids.substr(0, ids.length - 1);
-      this.$confirm('是否确认暂停?', '提示', {
+      this.$confirm('是否确认停止?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -142,49 +152,65 @@ export default {
     selectionRow (data) {
       this.selectTableRow = data;
     },
-    // 视频暂停
+    // 视频停止
     suspendVideo (ids, params) {
-      const url = 'task/dev/' + ids + '/';
-      wdsbServer.suspendDev(url, params).then(res => {
+      params.id_list = ids;
+      params.bulk = 1;
+      wdsbServer.suspendDev(params).then(res => {
         if (res.status === 200) {
           this.$message({
             message: '工作状态修改成功！',
             type: 'success'
           });
           this.selectTableRow = [];
-          this.getList();
+          this.getList(this.val);
         }
       })
     },
     // 视频删除
     pauseVideo (ids) {
-      const url = 'task/dev/' + ids + '/';
-      wdsbServer.deleteDev(url, { del_task: '1' }).then(res => {
+      wdsbServer.deleteDev({ del_task: '1', id_list: ids, bulk: 1 }).then(res => {
         if (res.status === 200) {
           this.$message({
             message: '删除成功！',
             type: 'success'
           });
           this.selectTableRow = [];
-          this.getList();
+          this.getList(this.val);
         }
       })
     },
+    handleCurrentChange (val) {
+      this.getList(val);
+      this.val = val;
+    },
     // 获取列表
-    getList () {
+    getList (page) {
       this.tableData = [];
-      wdsbServer.myDev({ task: '1' }).then(res => {
+      wdsbServer.myDev({ task: '1', app_type: this.$route.query.type, page: page }).then(res => {
         if (res.status === 200) {
-          res.data.forEach((t) => {
-            if (t.stats === 1) {
-              t.zt = '正在执行';
-            } else {
-              t.zt = '未执行';
-            }
-            t.key = t.id;
-            this.tableData.push(t);
-          });
-          this.getFilterData(this.tableData);
+          if (res.data.results.length > 0) {
+            const datas = res.data.results;
+            this.total = res.data.count;
+            datas.forEach((t) => {
+              switch (t.stats) {
+                case 0:
+                  t.zt = '未执行';
+                  break;
+                case 1:
+                  t.zt = '正在执行';
+                  break;
+                case 2:
+                  t.zt = '执行失败';
+                  break;
+                default:
+                  t.zt = '执行成功';
+              }
+              t.key = t.id;
+              this.tableData.push(t);
+            });
+            this.getFilterData(this.tableData);
+          }
         }
       })
     },
@@ -215,7 +241,7 @@ export default {
     }
   },
   mounted () {
-    this.getList();
+    this.getList(1);
   }
 }
 </script>
@@ -264,5 +290,8 @@ export default {
     border-color: #e68048;
     background-color: #e68048;
   }
+}
+/deep/ .is-center {
+  height: 47px !important;
 }
 </style>

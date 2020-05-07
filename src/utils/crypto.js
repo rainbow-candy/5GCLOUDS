@@ -5,6 +5,7 @@ import CryptoJS from 'crypto-js';
  * 加密解密
  */
 export const crypto = {
+  // DES加密操作
   encryptByDES (strMessage, key) {
     key = key || '\u0067\u0072\u0065\u0061\u0074\u006d\u0061\u0070';
     var keyHex = CryptoJS.enc.Utf8.parse(key);
@@ -14,6 +15,7 @@ export const crypto = {
     });
     return encrypted.toString();
   },
+  // DES解密操作
   decryptByDES (strMessage, key) {
     key = key || '\u0067\u0072\u0065\u0061\u0074\u006d\u0061\u0070';
     const keyHex = CryptoJS.enc.Utf8.parse(key);

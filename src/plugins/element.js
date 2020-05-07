@@ -20,7 +20,8 @@ import {
   Main,
   TableColumn,
   Upload,
-  InputNumber
+  InputNumber,
+  Pagination
 } from 'element-ui'
 // import ElementUI from 'element-ui';
 
@@ -43,6 +44,7 @@ Vue.use(Main)
 Vue.use(TableColumn)
 Vue.use(Upload)
 Vue.use(InputNumber)
+Vue.use(Pagination)
 Vue.prototype.$message = Message
 Vue.prototype.$confirm = MessageBox.confirm;
 Vue.prototype.$alert = MessageBox.alert;
