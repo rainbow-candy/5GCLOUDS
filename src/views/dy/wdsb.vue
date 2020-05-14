@@ -3,14 +3,9 @@
     <div>
       <img src="@/assets/imgs/title-wdsb.png" alt class="content-title"/>
       <div class="to-home" @click="toHome">
-        <div v-if="this.$route.query.type === 'dy'">
-          <i class="el-icon-refresh-left"></i>返回上级
-        </div>
-        <div v-if="this.$route.query.type !== 'dy'">
-          <i class="el-icon-s-home"></i>返回快手首页
-        </div>
+        <i class="el-icon-refresh-left"></i>返回上级
       </div>
-      <img src="@/assets/imgs/newlogo.png" alt style="width: 50px;position: absolute;right: 170px;top: 20px;"/>
+      <img src="@/assets/imgs/newlogo.png" alt class="logo-5g"/>
       <img src="@/assets/imgs/dy-logo.png" alt class="logo" v-if="this.$route.query.type === 'dy'" />
       <img src="@/assets/imgs/ks-logo.png" alt class="logo" v-if="this.$route.query.type !== 'dy'" />
     </div>
@@ -48,29 +43,34 @@ export default {
       tableColumns: [
         {
           prop: 'name',
-          label: '设备'
+          label: '设备',
+          minWidth: 100
         },
         {
           prop: 'type',
-          label: '型号'
+          label: '型号',
+          minWidth: 100
         },
         {
           prop: 'group',
-          label: '分组（可筛选）',
+          label: '分组',
           filter: true,
-          filterData: []
+          filterData: [],
+          minWidth: 150
         },
         {
           prop: 'stats',
           label: '工作状态',
           sortable: true,
-          backColor: true
+          backColor: true,
+          minWidth: 120
         },
         {
           prop: 'online',
           label: '在线情况',
           sortable: true,
-          backColorqk: true
+          backColorqk: true,
+          minWidth: 120
         }
       ],
       tableData: [],
@@ -119,7 +119,6 @@ export default {
       })
     },
     getList (page) {
-      this.tableData = [];
       const _this = this;
       wdsbServer.myDev({ mydev: 1, page: page }).then(res => {
         if (res.status === 200) {
@@ -176,22 +175,6 @@ export default {
     left: 0px;
     top: -3px;
   }
-  .to-home {
-    font-size: 1.5rem;
-    position: absolute;
-    right: 50px;
-    top: 90px;
-    cursor: pointer;
-    i {
-      margin-right: 10px;
-      font-size: 1.8rem;
-    }
-  }
-  .logo {
-    position: absolute;
-    top: 15px;
-    right: 50px;
-  }
 }
 .content {
   margin-top: 80px;
@@ -214,5 +197,13 @@ export default {
 }
 /deep/ .is-center {
   height: 47px;
+}
+@media screen and (max-width:770px ) {
+  .box {
+    padding: 40px 10px;
+  }
+  .content {
+    margin-top: 40px;
+  }
 }
 </style>

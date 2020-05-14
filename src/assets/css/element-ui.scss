@@ -32,8 +32,27 @@
   }
 }
 .el-pagination {
-  position: absolute;
-  bottom: 15px;
-  left: 50%;
-  transform: translate(-50%, 0%);
+  width: 100%;
+  text-align: center;
+}
+.el-table__body-wrapper {
+  overflow-y: auto;
+}
+// 兼容ios
+body .el-table th.gutter {
+  display: table-cell !important;
+}
+
+body .el-table colgroup.gutter {
+  display: table-cell !important;
+}
+
+table {
+  width: 100% !important;
+}
+
+@media screen and (max-width:770px ) {
+  .el-pagination {
+    white-space: pre-wrap;
+  }
 }

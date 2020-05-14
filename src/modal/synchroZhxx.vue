@@ -8,7 +8,7 @@
             <el-pagination
             class="xzyh-pagenation"
             @current-change="handleCurrentChange"
-            layout="prev, pager, next, total"
+            layout="prev, pager, next, total, jumper"
             :total="total"
             :current-page="current"
             ></el-pagination>
@@ -40,7 +40,7 @@ export default {
         },
         {
           prop: 'group',
-          label: '组别（可筛选）',
+          label: '组别',
           filter: true,
           filterData: []
         }
@@ -82,20 +82,26 @@ export default {
       });
       params.id_list = params.id_list.substr(0, params.id_list.length - 1);
       wdsbServer.putDev(params).then(res => {
+        console.log(res)
         if (res.status === 200) {
           this.dialogVisible = false;
           this.$message({
-            message: res.data.msg,
+            message: res.data,
             type: 'success'
           });
           this.$parent.getList();
+        } else if (res.status === 201) {
+          this.dialogVisible = false;
+          this.$message({
+            message: res.data,
+            type: 'warning'
+          });
         }
       })
     },
     // 取消
     cancel () {
       this.dialogVisible = false;
-      this.$parent.zbjzf(0);
     },
     // 重新勾选
     reSelect () {
@@ -108,7 +114,6 @@ export default {
       }, 500);
     },
     getList (page) {
-      this.tableData = [];
       const _this = this;
       wdsbServer.myDev({ mydev: 1, page: page }).then(res => {
         if (res.status === 200) {

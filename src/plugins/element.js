@@ -21,7 +21,9 @@ import {
   TableColumn,
   Upload,
   InputNumber,
-  Pagination
+  Pagination,
+  Loading,
+  Radio
 } from 'element-ui'
 // import ElementUI from 'element-ui';
 
@@ -45,6 +47,9 @@ Vue.use(TableColumn)
 Vue.use(Upload)
 Vue.use(InputNumber)
 Vue.use(Pagination)
+Vue.use(Radio)
+Vue.use(Loading.directive);
+Vue.prototype.$loading = Loading.service;
 Vue.prototype.$message = Message
 Vue.prototype.$confirm = MessageBox.confirm;
 Vue.prototype.$alert = MessageBox.alert;

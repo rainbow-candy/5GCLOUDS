@@ -11,7 +11,7 @@
         <el-form-item label="视频：">
           <el-upload
             class="upload-demo"
-            action="http://192.168.1.52:8888/api/task/dev/"
+            action="http://112.74.103.26/api/task/dev/"
             :on-preview="handlePreview"
             :before-upload="beforeUpload"
             :before-remove="beforeRemove"

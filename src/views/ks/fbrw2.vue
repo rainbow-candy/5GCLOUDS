@@ -1,78 +1,53 @@
 <template>
   <div class="box">
     <div>
-      <img src="@/assets/imgs/title-fbrw.png" alt class="content-title"/>
-      <img :src="this.$route.query.src" alt class="content-title-gn" />
+      <img src="@/assets/imgs/title-fbrw.png" alt class="search_str-title"/>
+      <img :src="this.$route.query.src" alt style="width:120px;" />
       <img src="@/assets/imgs/newlogo.png" alt class="logo-5g"/>
       <div class="to-home" @click="toHome">
         <i class="el-icon-refresh-left"></i>返回上级
       </div>
-      <img src="@/assets/imgs/dy-logo.png" alt class="logo"/>
+      <img src="@/assets/imgs/ks-logo.png" alt class="logo"/>
     </div>
     <div class="search_str">
-      <el-form label-position="right" :model="ruleForm" label-width="160px" :rules="rules" ref="ruleForm" class="ruleForm">
+      <el-form label-position="right" :model="ruleForm" label-width="160px" :rules="rules" ref="ruleForm" style="width: 650px;" class="ruleForm">
         <div class="required">*</div><el-form-item label="选择设备：">
           <i class="el-icon-plus" @click="xzsb"></i>
           <!-- <base-table :columns="sbColumns" :data="tableData" selection v-show="sbShow" height="182" @selection-change="selectionRow"></base-table> -->
         </el-form-item>
-        <el-form-item label="点赞数量：" v-if="this.$route.query.name === '推荐点赞' || this.$route.query.name === '同城点赞'" prop="to_num">
+        <el-form-item label="点赞数量：" v-if="this.$route.query.name === '发现' || this.$route.query.name === '同城点赞'" prop="to_num">
           <el-input-number v-model="ruleForm.to_num" controls-position="right" :min="1" label="请输入点赞数量"></el-input-number>
         </el-form-item>
-        <el-form-item label="搜索内容（大类）：" v-if="this.$route.query.name === '转发评论' || this.$route.query.name === '搜索关注'" prop="search_str">
+        <el-form-item label="搜索内容（大类）：" v-if="this.$route.query.name === '搜索大类' || this.$route.query.name === '关注网红'" prop="search_str">
           <el-input type="text" v-model="ruleForm.search_str" minlength="1" placeholder="请输入搜索内容"></el-input>
         </el-form-item>
-        <el-form-item label="搜索抖音ID号：" v-if="this.$route.query.name === '指定转发评论' || this.$route.query.name === '粉丝关注'" prop="search_str">
-          <el-input type="text" v-model="ruleForm.search_str" minlength="1" maxlength="15" show-word-limit placeholder="请输入抖音ID号"></el-input>
+        <el-form-item label="搜索数量：" v-if="this.$route.query.name === '搜索大类'" prop="to_num">
+          <el-input-number v-model="ruleForm.to_num" controls-position="right" :min="1" label="请输入搜索数量"></el-input-number>
         </el-form-item>
-        <el-form-item label="评论内容：" v-if="this.$route.query.name === '推荐点赞' || this.$route.query.name === '同城点赞'">
-          <el-radio v-model="radio" label="1">手动输入</el-radio>
-          <el-radio v-model="radio" label="2">批量上传</el-radio>
-          <el-input type="textarea" v-model="ruleForm.content" :rows="4" :maxlength="maxlength" show-word-limit placeholder="评论条数以“|”分隔" @input="plnrChange" v-if="radio === '1'"></el-input>
-          <el-upload
-            v-if="radio === '2'"
-            class="upload-demo"
-            action="http://112.74.103.26/api/task/dev/"
-            :on-change="beforeUpload"
-            :before-remove="beforeRemove"
-            multiple
-            :limit="1"
-            show-file-list
-            :auto-upload="false"
-            :on-exceed="handleExceed"
-            accept=".xls, .xlsx"
-            :file-list="fileList">
-            <div class="djsc">选择excel文件</div>
-          </el-upload>
+        <el-form-item label="搜索快手ID号：" v-if="this.$route.query.name === '搜索快手号'" prop="search_str">
+          <el-input type="text" v-model="ruleForm.search_str" minlength="1" maxlength="15" show-word-limit placeholder="请输入快手ID号"></el-input>
         </el-form-item>
-        <el-form-item label="关注数量：" v-if="this.$route.query.name === '搜索关注' || this.$route.query.name === '粉丝关注'" prop="to_num">
+        <el-form-item label="评论内容：" v-if="this.$route.query.name === '搜索大类' || this.$route.query.name === '发现' || this.$route.query.name === '同城点赞'">
+          <el-input type="textarea" v-model="ruleForm.content" :rows="4" :maxlength="maxlength" show-word-limit placeholder="评论条数以“|”分隔" @input="plnrChange"></el-input>
+        </el-form-item>
+        <el-form-item label="关注数量：" v-if="this.$route.query.name === '关注网红' || this.$route.query.name === '搜索快手号'" prop="to_num">
           <el-input-number v-model="ruleForm.to_num" controls-position="right" :min="1" label="请输入关注数量"></el-input-number>
           <!-- <el-input type="number" v-model="to_num"></el-input> -->
         </el-form-item>
-        <el-form-item label="私信内容：" v-if="this.$route.query.name === '搜索关注' || this.$route.query.name === '粉丝关注'">
+        <el-form-item label="私信内容：" v-if="this.$route.query.name === '关注网红' || this.$route.query.name === '搜索快手号'">
           <el-input type="textarea" v-model="ruleForm.content" :rows="3" placeholder="请输入私信内容"></el-input>
         </el-form-item>
-        <!-- <el-form-item label="选择素材：" v-if="this.$route.query.name === '上传视频'">
-          <i class="el-icon-plus" @click="xzsc"></i>
-        </el-form-item> -->
-        <div v-if="this.$route.query.name.indexOf('转发评论') !== -1">
-          <el-form-item label="转发数量：" prop="to_num">
-            <el-input-number v-model="ruleForm.to_num" controls-position="right" :min="1" label="请输入转发数量"></el-input-number>
-          </el-form-item>
-          <el-form-item label="评论(@好友)：">
-            <el-input type="textarea" v-model="ruleForm.content" :rows="3" maxlength="100" show-word-limit placeholder="输入好友抖音号即可"></el-input>
-          </el-form-item>
-        </div>
         <!-- 直播助力 -->
         <div v-if="this.$route.query.name === '直播助力'">
-          <el-form-item label="抖音号：" prop="search_str">
-            <el-input type="text" v-model="ruleForm.search_str" placeholder="请输入抖音号"></el-input>
+          <el-form-item label="直播间号：" prop="search_str">
+            <el-input type="text" v-model="ruleForm.search_str" placeholder="请输入直播间号"></el-input>
           </el-form-item>
-          <div class="required" style="left: 50px;">*</div><el-form-item label="直播间转发：">
+          <!-- <div class="required" style="left: 60px;">*</div><el-form-item label="直播间转发：">
             <div class="zxfs" style="display: flex;">
               <div :class="{ active: isActives }" @click="zbjzf('0')">否</div>
               <div :class="{ active: !isActives }" @click="zbjzf('1')">是</div>
             </div>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="弹幕文案：">
             <el-upload
               class="upload-demo"
@@ -123,8 +98,8 @@
         <!-- 执行方式 -->
         <div class="required">*</div><el-form-item label="执行方式：">
           <div class="zxfs" style="display: flex;">
-            <div :class="{ active: isActive }" @click="implement(0)">立即执行</div>
-            <div :class="{ active: !isActive }" @click="implement(1)">定时执行</div>
+            <div :class="{ active: isActive }" @click="implement('0')">立即执行</div>
+            <div :class="{ active: !isActive }" @click="implement('1')">定时执行</div>
           </div>
         </el-form-item>
         <el-form-item label="">
@@ -164,7 +139,6 @@ export default {
   components: { xzscModal, forwardModal },
   data () {
     return {
-      radio: '1',
       sbShow: false,
       isActive: true,
       isActives: true,
@@ -216,8 +190,7 @@ export default {
         disabledDate (time) {
           return time.getTime() < Date.now() - 8.64e7;
         }
-      },
-      num: 0
+      }
     }
   },
   methods: {
@@ -257,7 +230,7 @@ export default {
         this.isActive = !this.isActive
       }
       this.num = num;
-      if (num === 0) {
+      if (num === '0') {
         this.timing = false;
       } else {
         // 定时执行
@@ -282,13 +255,13 @@ export default {
             const resDate = d.getFullYear() + '-' + this.p((d.getMonth() + 1)) + '-' + this.p(d.getDate())
             const resTime = this.p(d.getHours()) + ':' + this.p(d.getMinutes()) + ':' + this.p(d.getSeconds())
             this.ruleForm.task_time = resDate + ' ' + resTime;
-            if (this.$route.query.name === '上传视频' || this.$route.query.name === '直播助力' || this.$route.query.name === '推荐点赞' || this.$route.query.name === '同城点赞') {
+            if (this.$route.query.name === '上传视频' || this.$route.query.name === '直播助力') {
               this.submit(this.ruleForm.task_time);
             } else {
               this.ljzx(this.ruleForm.task_time);
             }
           } else {
-            if (this.$route.query.name === '上传视频' || this.$route.query.name === '直播助力' || this.$route.query.name === '推荐点赞' || this.$route.query.name === '同城点赞') {
+            if (this.$route.query.name === '上传视频' || this.$route.query.name === '直播助力') {
               this.submit();
             } else {
               this.ljzx();
@@ -427,69 +400,61 @@ export default {
       }
     },
     handleExceed (files, fileList) {
-      this.$message.warning('当前限制选择 1 个文件!');
+      this.$message.warning(`当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
     },
     beforeRemove (file, fileList) {
       return this.$confirm(`确定移除 ${file.name}？`);
     },
     // 上传视频
     submit (time) {
-      console.log(this.radio);
       if (this.toFileList.length === 0) {
-        if (this.$route.query.name === '推荐点赞' || this.$route.query.name === '同城点赞') {
-          if (this.radio === '2') {
-            this.$message.warning('请上传文件');
-            return;
+        this.$message.warning('请上传文件')
+      } else {
+        const params = {
+          id: ''
+        };
+        const formData = new FormData();
+        // 立即执行不需要传task_time
+        if (!this.isActive) {
+          formData.append('task_time', time);
+          if (time === undefined) {
+            this.$message.warning('请选择定时执行的时间');
           }
-        } else if (this.$route.query.name === '上传视频') {
-          this.$message.warning('请上传文件');
-          return;
         }
-      }
-      console.log('走接口')
-      const params = {
-        id: ''
-      };
-      const formData = new FormData();
-      // 立即执行不需要传task_time
-      if (!this.isActive) {
-        formData.append('task_time', time);
-        if (time === undefined) {
-          this.$message.warning('请选择定时执行的时间');
+        console.log(this.selectTableRow);
+        if (this.selectTableRow.length > 1) {
+          // 批量修改的接口
+          this.selectTableRow.forEach(t => {
+            params.id += t.id + ','
+          });
+          params.id = params.id.substr(0, params.id.length - 1);
+        } else if (this.selectTableRow.length === 1) {
+          // 单独修改的接口
+          params.id = this.selectTableRow[0].id;
         }
+        // 拼接content
+        if (this.$route.query.name === '上传视频') {
+          this.ruleForm.content = this.ruleForm.spwb + ',,,,,' + this.ruleForm.spht + ',,,,,' + this.ruleForm.sphy;
+        }
+        // 观看直播时间
+        formData.append('id', params.id);
+        formData.append('task_nick', this.$route.query.name);
+        formData.append('app_type', this.$route.query.type);
+        formData.append('content', this.ruleForm.content);
+        if (this.$route.query.name === '直播助力') {
+          formData.append('to_num', this.ruleForm.to_num);
+          formData.append('search_str', this.ruleForm.search_str);
+        }
+        formData.append('to_file', this.toFileList[0]);
+        formData.append('bulk', 1);
+        const url = 'http://112.74.103.26/api/task/dev/';
+        this.makeXMLHttpRequest(url, formData, this)
       }
-      // 拼接content
-      if (this.$route.query.name === '上传视频') {
-        this.ruleForm.content = this.ruleForm.spwb + ',,,,,' + this.ruleForm.spht + ',,,,,' + this.ruleForm.sphy;
-      }
-      // 批量修改的接口
-      this.selectTableRow.forEach(t => {
-        params.id += t.id + ','
-      });
-      params.id = params.id.substr(0, params.id.length - 1);
-
-      // 观看直播时间
-      formData.append('id', params.id);
-      formData.append('content', this.ruleForm.content);
-      formData.append('task_nick', this.$route.query.name);
-      formData.append('app_type', this.$route.query.type);
-
-      if (this.$route.query.name === '直播助力') {
-        formData.append('to_num', this.ruleForm.to_num);
-        formData.append('search_str', this.ruleForm.search_str);
-      } else if (this.$route.query.name === '推荐点赞' || this.$route.query.name === '同城点赞') {
-        formData.append('to_num', this.ruleForm.to_num);
-      }
-      formData.append('to_file', this.toFileList[0]);
-      formData.append('bulk', 1);
-      const url = 'http://112.74.103.26/api/task/dev/';
-      this.makeXMLHttpRequest(url, formData, this);
     },
 
     makeXMLHttpRequest (url, data, _this) {
       var request = new XMLHttpRequest();
       request.onreadystatechange = function (res) {
-        console.log(request)
         if (request.readyState === 4) {
           if (request.status === 200) {
             if (request.response === '') {
@@ -525,14 +490,11 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.content-title {
+.search_str-title {
   width: 300px;
   position: absolute;
   left: 0px;
   top: -3px;
-}
-.content-title-gn {
-  width: 120px;
 }
 .box {
   padding: 110px 40px 0 40px;
@@ -558,8 +520,7 @@ export default {
     margin-left: 100px;
   }
   .ruleForm {
-    width: 650px;
-    /deep/ .el-table, /deep/ .el-input, /deep/.el-textarea, /deep/ .el-input-number {
+    /deep/ .el-table, /deep/ .el-input, /deep/.el-textarea {
       width: 400px;
       /deep/ .el-input__inner {
         text-align: left;
@@ -596,6 +557,9 @@ export default {
     background-color: #53bce0;
   }
 }
+/deep/ .el-input-number {
+  width: 400px;
+}
 .fbrw-pagenation {
   left: 310px;
 }
@@ -605,38 +569,5 @@ export default {
   top: 27px;
   color: #f56c7e;
   font-size: 15px;
-}
-
-@media screen and (max-width:770px ) {
-  .box {
-    padding: 40px 0 0 0;
-  }
-  .content-title-gn {
-    width: 50px;
-    // margin-top: -50px;
-  }
-  .search_str {
-    margin-top: 10px;
-    .ruleForm {
-      width: 400px;
-      /deep/ .el-table, /deep/ .el-input, /deep/.el-textarea, /deep/ .el-input-number {
-        width: 200px;
-        /deep/ .el-input__inner {
-          text-align: left;
-        }
-      }
-    }
-    .djsc {
-      width: 200px;
-    }
-    .zxfs {
-      div {
-        width: 100px;
-      }
-    }
-    .zxBtn {
-      margin-left: 0;
-    }
-  }
 }
 </style>

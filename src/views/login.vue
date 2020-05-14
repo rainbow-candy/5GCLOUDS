@@ -3,14 +3,14 @@
         <img src="../assets/imgs/left-back.png" alt="" class="left-back">
         <img src="../assets/imgs/right-back.png" alt="" class="right-back">
         <div class="content">
-          <img src="../assets/imgs/newlogo.png" alt="" style="margin-top: 9%;">
+          <img src="../assets/imgs/newlogo.png" alt="" class="logos">
               <!-- 登录表单区域 -->
           <el-form :model="loginForm" label-width="0px" class="login_form" :rules="rules" ref="loginFormRef">
               <el-form-item prop="username">
                   <el-input placeholder="请输入账号" prefix-icon="iconfont icon-user" v-model="loginForm.username" @keyup.enter.native="onSubmit"></el-input>
               </el-form-item>
               <el-form-item prop="password">
-                  <el-input placeholder="请输入密码" prefix-icon="iconfont icon-3702mima" v-model="loginForm.password" type="password" @keyup.enter.native="onSubmit"></el-input>
+                  <el-input placeholder="请输入密码" prefix-icon="iconfont icon-3702mima" v-model="loginForm.password" type="password" @keyup.enter.native="onSubmit" show-password></el-input>
               </el-form-item>
               <el-row class="btns">
                   <el-button type="primary" @click="onSubmit" @keyup.enter.native="onSubmit">登录</el-button>
@@ -56,7 +56,6 @@ export default {
       this.$refs.loginFormRef.validate((valid) => {
         this.loading = true;
         if (valid) {
-          // password: crypto.encryptByDES(this.loginForm.password),
           const params = {
             username: this.loginForm.username,
             password: crypto.encryptByDES(this.loginForm.password)
@@ -70,7 +69,15 @@ export default {
                   token: 'JWT ' + res.data.token
                 };
                 window.sessionStorage.setItem('token', parameter.token);
-                location.reload();
+                window.localStorage.setItem('expire', res.data.expire);
+                if (!res.data.is_chrome) {
+                  this.$message('建议使用谷歌浏览器！');
+                  window.setInterval(() => {
+                    location.reload();
+                  }, 1000);
+                } else {
+                  location.reload();
+                }
                 // 获取token过期时间
                 const expires = setUserLocal();
                 // 设置token缓存
@@ -91,12 +98,6 @@ export default {
             .finally(() => {
               this.loading = false;
             });
-        } else {
-          this.$message({
-            type: 'warning',
-            message: '请输入用户名和密码！'
-          });
-          this.loading = false;
         }
       });
     },
@@ -140,8 +141,11 @@ export default {
     height: 100%;
   }
 }
+.logos {
+  margin-top: 9%;
+}
 .login_form {
-  width: 35%;
+  width: 450px;
   background-color: #fff;
   border-radius: 3px;
   position: relative;
@@ -160,6 +164,19 @@ export default {
   /deep/ .el-button--primary {
     background-color: #97392b;
     border-color: #97392b;
+  }
+}
+@media screen and (max-width:770px ) {
+  .left-back, .right-back {
+    display: none;
+  }
+  .login_form {
+    width: 85vw;
+    padding: 0 7vw;
+  }
+  .logo {
+    margin-top: 10vh;
+    width: 75vw;
   }
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="取关数量" :visible.sync="dialogVisible" width="300px">
+  <el-dialog title="取关数量" :visible.sync="dialogVisible" width="400px">
     <el-input-number v-model="num" controls-position="right" :min="1" label="请输入取关数量"></el-input-number>
     <span slot="footer" class="dialog-footer">
       <el-button @click="cancel">取 消</el-button>
@@ -17,12 +17,15 @@ export default {
     return {
       dialogVisible: false,
       num: 1,
-      checkList: []
+      checkList: [],
+      val: 1
     }
   },
   methods: {
-    open (data) {
+    open (data, val) {
       this.num = 1;
+      // 父组件的页数
+      this.val = val;
       this.dialogVisible = true;
       this.checkList = data;
     },
@@ -32,7 +35,7 @@ export default {
       this.checkList.forEach(t => {
         if (t.gz_num < this.num) {
           this.$message({
-            message: `抖音号为${t.dy_num}的粉丝数量小于取关数量，请重新输入！`,
+            message: `抖音号为${t.dy_num}的关注数量小于取关数量，请重新输入！`,
             type: 'warning'
           });
         } else {
@@ -49,7 +52,13 @@ export default {
               message: res.data.msg,
               type: 'success'
             });
-            this.$parent.getList();
+            this.$parent.getList(this.val);
+          } else if (res.status === 201) {
+            this.dialogVisible = false;
+            this.$message({
+              message: res.data,
+              type: 'warning'
+            });
           }
         })
       }

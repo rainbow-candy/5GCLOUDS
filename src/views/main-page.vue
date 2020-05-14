@@ -1,6 +1,6 @@
 <template>
   <div>
-    <img src="@/assets/imgs/zhu-home.png" alt class="zhu-home" />
+    <img src="@/assets/imgs/zhu-home.png" alt class="content-title" />
     <div class="login_name">{{app_info.username}}</div>
     <img src="@/assets/imgs/logout.png" alt class="logout-home" @click="logout"/>
     <img src="@/assets/imgs/right-home.png" alt class="right-home" />
@@ -20,10 +20,10 @@
           <img src="@/assets/imgs/ks-btn.png" alt class="ks" @click="visible = !visible" slot="reference"/>
         </el-popover>
         <!-- <img src="@/assets/imgs/ks-btn.png" alt class="ks" @click="toKS" /> -->
-        <img src="@/assets/imgs/dy-btn.png" alt class="dy" @click="toDY" />
+        <img src="@/assets/imgs/dy-btn-1.png" alt class="dy" @click="toDY" />
       </div>
     </div>
-    <div class="deadline">VIP服务截止时间2020-02-12</div>
+    <div class="deadline">{{expire}}</div>
   </div>
 </template>
 
@@ -36,11 +36,14 @@ export default {
   data () {
     return {
       visible: false,
-      app_info: {}
+      app_info: {},
+      expire: ''
     }
   },
   mounted () {
+    // 用户信息
     this.app_info = JSON.parse(window.localStorage.getItem('APP_INFO'));
+    this.expire = `VIP服务截止时间：${window.localStorage.getItem('expire')}`;
   },
   methods: {
     logout () {
@@ -55,7 +58,10 @@ export default {
             window.localStorage.clear();
             window.sessionStorage.clear();
           }
-        })
+        }).catch((error) => {
+          this.$message.error('服务异常，退出失败！')
+          console.log(error.response);
+        });
     },
     toKS () {
       this.$router.push({
@@ -74,11 +80,24 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.zhu-home {
+.content-title {
   position: absolute;
   left: -1px;
   top: -6px;
   width: 300px;
+}
+.login_name {
+  font-size: 29px;
+  position: absolute;
+  left: 50%;
+  margin-left: -150px;
+  color: #fff;
+  background-color: #97392c;
+  height: 80px;
+  line-height: 78px;
+  width: 300px;
+  text-align: center;
+  border-radius: 0 0 60px 60px;
 }
 .logout-home {
   position: absolute;
@@ -122,6 +141,39 @@ export default {
   .dy {
     margin-left: 3%;
     cursor: pointer;
+  }
+}
+.deadline {
+  position: absolute;
+  bottom: 19px;
+  left: 50%;
+  margin-left: -130px;
+  letter-spacing: 3px;
+  font-size: 16px;
+}
+// 兼容手机
+@media screen and (max-width:770px ) {
+  .login_name {
+    font-size: 12px;
+    margin-left: -15vw;
+    height: 4vh;
+    line-height: 4vh;
+    width: 30vw;
+  }
+  .content {
+    top: 22vh;
+    img {
+      width: 60vw;
+    }
+    .dy {
+      margin-left: 0;
+      margin-top: 5vh;
+    }
+  }
+  .deadline {
+    font-size: 12px;
+    letter-spacing: 1px;
+    left: 60vw;
   }
 }
 </style>

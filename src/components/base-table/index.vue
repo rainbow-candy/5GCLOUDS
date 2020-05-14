@@ -11,6 +11,7 @@
     :stripe="stripe"
     :default-sort="defaultSort"
     :max-height="height"
+    :height="height"
     :show-summary="showSummary"
     :tree-props="treeProps"
     row-key="id"
@@ -39,6 +40,7 @@
         :prop="item.prop"
         :label="item.label"
         :width="item.width"
+        :min-width="item.minWidth"
         :sortable="item.sortable"
         show-overflow-tooltip
         align="center"
@@ -77,12 +79,25 @@
         :prop="item.prop"
         :label="item.label"
         :width="item.width"
+        :min-width="item.minWidth"
         :sortable="item.sortable"
         :filters="item.filterData"
         :filter-method="filterTag"
         show-overflow-tooltip
         align="center"
-      ></el-table-column>
+      >
+      <template slot-scope="{ row }">
+          <template v-if="item.backColor">
+            <div  v-bind:class="[ {'backColor0': formatData(item, row) === '执行成功'}, {'backColor1': formatData(item, row) === '正在执行'}, {'backColor2': formatData(item, row) === '未执行'}, {'backColor3': formatData(item, row) === '执行失败'}  ]">
+            <!-- <div  v-bind:class="[ formatData(item, row) === '正在执行' ? 'backColor1' : 'backColor2'  ]"> -->
+              {{formatData(item, row)}}
+            </div>
+          </template>
+          <template v-else>
+            {{ formatData(item, row) }}
+          </template>
+      </template>
+      </el-table-column>
     </template>
     <slot></slot>
   </el-table>
@@ -150,7 +165,7 @@ export default {
     },
     order: {
       type: Boolean,
-      default: true
+      default: false
     },
     selection: {
       type: Boolean,
@@ -265,5 +280,8 @@ export default {
   .backColor3 {
     background-color: #e06262;
   }
+}
+/deep/ .el-table__column-filter-trigger i {
+  font-size: 20px;
 }
 </style>

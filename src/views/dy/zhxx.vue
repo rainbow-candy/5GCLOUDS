@@ -2,7 +2,7 @@
   <div class="box">
     <div>
       <img src="@/assets/imgs/title-zhxx.png" alt class="content-title"/>
-      <img src="@/assets/imgs/newlogo.png" alt style="width: 50px;position: absolute;right: 170px;top: 20px;"/>
+      <img src="@/assets/imgs/newlogo.png" alt class="logo-5g"/>
       <div class="to-home" @click="toHome"><i class="el-icon-refresh-left"></i>返回上级</div>
       <img src="@/assets/imgs/dy-logo.png" alt="" class="logo">
     </div>
@@ -52,21 +52,24 @@ export default {
         },
         {
           prop: 'name',
-          label: '设备（可筛选）',
+          label: '设备',
           filter: true,
           filterData: []
         },
         {
           prop: 'hz_num',
-          label: '获赞数量'
+          label: '获赞数量',
+          minWidth: 100
         },
         {
           prop: 'gz_num',
-          label: '关注数量'
+          label: '关注数量',
+          minWidth: 100
         },
         {
           prop: 'fs_num',
-          label: '粉丝数量'
+          label: '粉丝数量',
+          minWidth: 100
         },
         {
           prop: 'account_data',
@@ -108,13 +111,12 @@ export default {
           message: '请先选择设备！'
         });
       } else {
-        this.$refs.unfollowModal.open(this.selectTableRow);
+        this.$refs.unfollowModal.open(this.selectTableRow, this.val);
       }
     },
     // 搜索抖音号
     queryDyh () {
-      console.log(this.input4);
-      this.getList(1, this.input4);
+      this.getList(this.val, this.input4);
     },
     handleCurrentChange (val) {
       this.getList(val);
@@ -122,9 +124,22 @@ export default {
     },
     // 获取列表
     getList (page, dyh) {
-      this.tableData = [];
       const _this = this;
-      wdsbServer.myDev({ info: 1, page: page, app_type: this.$route.query.type, dy_s: dyh }).then(res => {
+      var parms = {};
+      if (dyh) {
+        parms = {
+          app_type: this.$route.query.type,
+          dy_s: dyh
+        }
+      } else {
+        parms = {
+          info: 1,
+          page: page,
+          app_type: this.$route.query.type,
+          dy_s: dyh
+        }
+      }
+      wdsbServer.myDev(parms).then(res => {
         if (res.status === 200) {
           if (res.data.results.length > 0) {
             const datas = res.data.results;
@@ -207,22 +222,6 @@ export default {
     left: -4px;
     top: -3px;
   }
-  .to-home {
-    font-size: 1.5rem;
-    position: absolute;
-    right: 50px;
-    top: 90px;
-    cursor: pointer;
-    i {
-      margin-right: 10px;
-      font-size: 1.8rem;
-    }
-  }
-  .logo {
-    position: absolute;
-    top: 15px;
-    right: 50px;
-  }
 }
 .content {
   margin-top: 30px;
@@ -245,6 +244,23 @@ export default {
     color: #fff;
     border-color: #e68048;
     background-color: #e68048;
+  }
+}
+@media screen and (max-width:770px ) {
+  .box {
+    padding: 35px 0 0 0;
+  }
+  .content {
+    padding: 20px;
+    .refresh-btn {
+      width: 63px;
+    }
+    /deep/ .el-button {
+      span {
+        margin-left: -13px;
+        font-size: 12px;
+      }
+    }
   }
 }
 </style>

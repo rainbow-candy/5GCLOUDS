@@ -3,10 +3,9 @@
     <div>
       <img src="@/assets/imgs/title-khfk.png" alt class="content-title"/>
       <div class="to-home" @click="toHome">
-        <div v-if="this.$route.query.type === 'dy'"><i class="el-icon-refresh-left"></i>返回上级</div>
-        <div v-if="this.$route.query.type !== 'dy'"><i class="el-icon-s-home"></i>返回快手首页</div>
+        <i class="el-icon-refresh-left"></i>返回上级
       </div>
-      <img src="@/assets/imgs/newlogo.png" alt style="width: 50px;position: absolute;right: 170px;top: 20px;"/>
+      <img src="@/assets/imgs/newlogo.png" alt class="logo-5g"/>
       <img src="@/assets/imgs/dy-logo.png" alt class="logo" v-if="this.$route.query.type === 'dy'"/>
       <img src="@/assets/imgs/ks-logo.png" alt class="logo" v-if="this.$route.query.type !== 'dy'"/>
     </div>
@@ -85,22 +84,6 @@ export default {
     position: absolute;
     left: -2px;
     top: -4px;
-  }
-  .to-home {
-    font-size: 1.5rem;
-    position: absolute;
-    right: 50px;
-    top: 90px;
-    cursor: pointer;
-    i {
-      margin-right: 10px;
-      font-size: 1.8rem;
-    }
-  }
-  .logo {
-    position: absolute;
-    top: 15px;
-    right: 50px;
   }
 }
 .content {

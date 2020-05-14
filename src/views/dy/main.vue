@@ -2,9 +2,9 @@
   <div>
     <img src="@/assets/imgs/title-dy.png" alt class="content-title"/>
     <div class="to-home" @click="toHome" title="返回主界面"><i class="el-icon-s-home"></i>返回主界面</div>
-    <img src="@/assets/imgs/newlogo.png" alt style="width: 50px;position: absolute;right: 170px;top: 20px;"/>
+    <img src="@/assets/imgs/newlogo.png" alt class="logo-5g"/>
     <img src="@/assets/imgs/dy-logo.png" alt class="logo"/>
-    <div class="content">
+    <div class="content" v-if="fullWidth > 770">
       <div>
         <img src="@/assets/imgs/wdsb.png" alt class="ks" @click="wdsb" />
         <img src="@/assets/imgs/fbrw.png" alt class="dy" @click="fbrw" />
@@ -32,16 +32,54 @@
         </el-popover> -->
         <img src="@/assets/imgs/zhxx.png" alt class="dy" @click="zhxx" />
       </div>
+      <khfkModal ref="khfkModal"></khfkModal>
+    </div>
+    <!-- 手机适配 -->
+    <div class="content" v-if="fullWidth <= 770">
+      <div>
+        <img src="@/assets/imgs/wdsb.png" alt class="ks" @click="wdsb" />
+        <img src="@/assets/imgs/fbrw.png" alt class="dy" @click="fbrw" />
+      </div>
+      <div>
+        <img src="@/assets/imgs/rwlb.png" alt class="ks" @click="ckrw" />
+        <img src="@/assets/imgs/gjcss.png" alt class="dy" @click="gjcss"/>
+      </div>
+      <div>
+        <!-- <el-popover
+          placement="bottom"
+          title="提示"
+          width="270"
+          trigger="hover"
+          content="升级版将在5月正式上线......"
+          v-model="gjcssVisible">
+          <img src="@/assets/imgs/gjcss.png" alt class="ks" @click="gjcssVisible = !gjcssVisible" slot="reference"/>
+        </el-popover> -->
+        <img src="@/assets/imgs/khfk.png" alt class="ks" @click="xxfk" />
+        <!-- <el-popover
+          placement="bottom"
+          title="提示"
+          width="270"
+          trigger="hover"
+          content="升级版将在5月正式上线......">
+          <img src="@/assets/imgs/zhxx.png" alt class="dy" @click="zhxxVisible = !zhxxVisible"  slot="reference"/>
+        </el-popover> -->
+        <img src="@/assets/imgs/zhxx.png" alt class="dy" @click="zhxx" />
+      </div>
+      <khfkModal ref="khfkModal"></khfkModal>
     </div>
   </div>
 </template>
 
 <script>
+import khfkModal from './khfk';
+
 export default {
+  components: { khfkModal },
   data () {
     return {
       zhxxVisible: false,
-      gjcssVisible: false
+      gjcssVisible: false,
+      fullWidth: document.documentElement.clientWidth
     }
   },
   methods: {
@@ -78,10 +116,11 @@ export default {
     },
     // 信息反馈
     xxfk () {
-      this.$router.push({
-        path: '/feedback',
-        query: { type: 'dy' }
-      });
+      // this.$router.push({
+      //   path: '/feedback',
+      //   query: { type: 'dy' }
+      // });
+      this.$refs.khfkModal.open();
     },
     // 账号信息
     zhxx () {
@@ -89,33 +128,28 @@ export default {
         path: '/account',
         query: { type: 'dy' }
       });
+    },
+    handleResize () {
+      this.fullWidth = document.documentElement.clientWidth;
+      window.sessionStorage.setItem('fullWidth', this.fullWidth);
     }
+  },
+  created () {
+    window.addEventListener('resize', this.handleResize);
+    window.sessionStorage.setItem('fullWidth', this.fullWidth);
+  },
+  beforeDestroy () {
+    window.removeEventListener('resize', this.handleResize);
   }
 }
 </script>
 
 <style lang="less" scoped>
-.to-home {
-  font-size: 1.5rem;
-  position: absolute;
-  right: 50px;
-  top: 90px;
-  cursor: pointer;
-  i {
-    margin-right: 10px;
-    font-size: 1.8rem;
-  }
-}
 .content-title {
   width: 300px;
   position: absolute;
   left: -2px;
   top: -7px;
-}
-.logo {
-  position: absolute;
-  top: 15px;
-  right: 50px;
 }
 .content {
   position: absolute;
@@ -132,6 +166,13 @@ export default {
   }
   .dy {
     margin-left: 2%;
+  }
+}
+@media screen and (max-width:770px ) {
+  .content {
+    img {
+      width: 30%;
+    }
   }
 }
 </style>

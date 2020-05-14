@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="组别昵称" :visible.sync="dialogVisible" width="800px">
+  <el-dialog title="组别昵称" :visible.sync="dialogVisible" :width="dialogWidth">
     <!-- <el-input v-model="group"  placeholder="请输入组别昵称" maxlength="6" show-word-limit></el-input> -->
     <el-form label-width="100px">
       <el-form-item label="组别昵称：">
@@ -40,7 +40,7 @@ export default {
   name: 'addGroup',
   data () {
     return {
-      total: 50,
+      total: 1,
       current: 1,
       dialogVisible: false,
       group: '',
@@ -77,15 +77,19 @@ export default {
         },
         {
           prop: 'group',
-          label: '组别（可筛选）',
+          label: '组别',
           filter: true,
           filterData: [],
           width: 200
         }
       ],
       tableData: [],
-      currentCheck: {}
+      currentCheck: {},
+      dialogWidth: ''
     }
+  },
+  mounted () {
+    this.dialogWidth = window.sessionStorage.getItem('fullWidth') > 770 ? '800px' : '100%';
   },
   methods: {
     open (data, tableData) {

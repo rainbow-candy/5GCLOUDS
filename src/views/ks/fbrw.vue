@@ -2,19 +2,19 @@
   <div class="box">
     <div>
       <img src="@/assets/imgs/title-fbrw.png" alt class="content-title"/>
-      <img src="@/assets/imgs/newlogo.png" alt style="width: 50px;position: absolute;right: 170px;top: 20px;"/>
-      <div class="to-home" @click="toHome"><i class="el-icon-s-home"></i>返回快手首页</div>
+      <img src="@/assets/imgs/newlogo.png" alt class="logo-5g"/>
+      <div class="to-home" @click="toHome"><i class="el-icon-refresh-left"></i>返回上级</div>
       <img src="@/assets/imgs/ks-logo.png" alt="" class="logo">
     </div>
     <div class="content">
       <el-row>
         <el-col :span="6" v-for="(item, index) in colList1" :key="index">
-          <img :src="item.src" alt="" @click="publishTask(item.src)">
+          <img :src="item.src" alt="" @click="publishTask(item.src, item.label)">
         </el-col>
       </el-row>
       <el-row>
         <el-col :span="6" v-for="(item, index) in colList2" :key="index">
-          <img :src="item.src" alt="" @click="publishTask(item.src)">
+          <img :src="item.src" alt="" @click="publishTask(item.src, item.label)">
         </el-col>
       </el-row>
     </div>
@@ -27,20 +27,27 @@ export default {
   data () {
     return {
       colList1: [{
-        src: require('@/assets/imgs/ks/gzwh.png')
+        src: require('@/assets/imgs/ks/gzwh.png'),
+        label: '关注网红'
       }, {
-        src: require('@/assets/imgs/ks/ssdl.png')
+        src: require('@/assets/imgs/ks/ssdl.png'),
+        label: '搜索大类'
       }, {
-        src: require('@/assets/imgs/ks/ssksh.png')
+        src: require('@/assets/imgs/ks/ssksh.png'),
+        label: '搜索快手号'
       }, {
-        src: require('@/assets/imgs/ks/zbzl.png')
+        src: require('@/assets/imgs/ks/zbzl.png'),
+        label: '直播助力'
       }],
       colList2: [{
-        src: require('@/assets/imgs/ks/fx.png')
+        src: require('@/assets/imgs/ks/fx.png'),
+        label: '发现'
       }, {
-        src: require('@/assets/imgs/ks/scsp.png')
+        src: require('@/assets/imgs/ks/scsp.png'),
+        label: '上传视频'
       }, {
-        src: require('@/assets/imgs/ks/tcdz.png')
+        src: require('@/assets/imgs/ks/tcdz.png'),
+        label: '同城点赞'
       }]
     }
   },
@@ -49,10 +56,10 @@ export default {
       this.$router.go(-1);
     },
     // 跳转发布任务2
-    publishTask (src) {
+    publishTask (src, label) {
       this.$router.push({
-        path: '/publishTask2',
-        query: { src: src }
+        path: '/kspublishTask2',
+        query: { src: src, type: 'ks', name: label }
       });
     }
   }
@@ -61,28 +68,14 @@ export default {
 
 <style lang="less" scoped>
 .box {
-  padding: 100px 40px 0 40px;
+  padding: 120px 40px 0 40px;
+  width: 90%;
+  margin-left: 5%;
   .content-title {
     width: 300px;
     position: absolute;
     left: -2px;
     top: -3px;
-  }
-  .to-home {
-    font-size: 1.5rem;
-    position: absolute;
-    right: 50px;
-    top: 90px;
-    cursor: pointer;
-    i {
-      margin-right: 10px;
-      font-size: 1.8rem;
-    }
-  }
-  .logo {
-    position: absolute;
-    top: 15px;
-    right: 50px;
   }
 }
 .content {
@@ -91,7 +84,7 @@ export default {
     text-align: center;
     padding: 30px 0;
     img {
-      width: 150px;
+      width: 170px;
     }
   }
 }

@@ -1,19 +1,19 @@
 <template>
   <div>
     <img src="@/assets/imgs/ks/title-ks.png" alt class="content-title"/>
-    <img src="@/assets/imgs/newlogo.png" alt style="width: 50px;position: absolute;right: 170px;top: 20px;"/>
+    <img src="@/assets/imgs/newlogo.png" alt class="logo-5g"/>
     <div class="to-home" @click="toHome"><i class="el-icon-s-home"></i>返回主界面</div>
     <img src="@/assets/imgs/ks-logo.png" alt class="logo" />
     <div class="content">
-      <div>
+      <div class="row">
         <img src="@/assets/imgs/wdsb.png" alt class="leftImg" @click="wdsb" />
         <img src="@/assets/imgs/fbrw.png" alt class="rightImg" @click="fbrw" />
       </div>
-      <div>
+      <div class="row">
         <img src="@/assets/imgs/gjcss.png" alt class="leftImg" @click="gjcss" />
         <img src="@/assets/imgs/rwlb.png" alt class="rightImg" @click="ckrw" />
       </div>
-      <div>
+      <div class="row">
         <img src="@/assets/imgs/khfk.png" alt class="centerImg" @click="xxfk" />
       </div>
     </div>
@@ -75,12 +75,15 @@ export default {
 }
 .content {
   position: absolute;
-  top: 27%;
+  top: 18%;
   left: 0;
   width: 100%;
+  .row {
+    margin: 15px 0;
+  }
   img {
     width: 20%;
-    max-width: 400px;
+    max-width: 380px;
     cursor: pointer;
   }
   .leftImg {
