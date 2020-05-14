@@ -168,10 +168,10 @@ export default {
         ids += t.id + ',';
       });
       ids = ids.substr(0, ids.length - 1);
-      var age2 = this.selectTableRow.every(function (item) {
-        return item.stats === 0;
+      var age2 = this.selectTableRow.find((item) => {
+        return item.stats === 1;
       });
-      if (age2) {
+      if (!age2) {
         this.$confirm('是否确认删除?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -196,7 +196,6 @@ export default {
       params.id_list = ids;
       params.bulk = 1;
       wdsbServer.suspendDev(params).then(res => {
-        console.log(res)
         if (res.status === 200) {
           this.$message({
             message: '工作状态修改成功！',
@@ -229,6 +228,7 @@ export default {
     handleCurrentChange (val) {
       this.getList(val);
       this.val = val;
+      this.$refs.baseTable.handleCurrentChange();
     },
     handleSizeChange (val) {
       this.page_size = val;
@@ -263,6 +263,10 @@ export default {
             this.tableColumns[1].filterData = this.getFilter(this.tableData, 'group');
             this.tableColumns[2].filterData = this.getFilter(this.tableData, 'task_nick');
             this.tableColumns[4].filterData = this.getFilter(this.tableData, 'zt');
+            this.selectTableRow = [];
+            this.$refs.baseTable.clearSelection();
+          } else {
+            this.tableData = []
           }
         }
       })

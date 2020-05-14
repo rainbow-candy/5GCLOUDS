@@ -70,7 +70,7 @@
           </el-input>
           </el-col>
         </el-row>
-        <base-table :columns="tableColumns" :data="xsTableData" selection  height="530" @selection-change="selectionRow1" v-if="this.$route.query.type === 'dy'">
+        <base-table ref="sbTable" :columns="tableColumns" :data="xsTableData" selection  height="530" @selection-change="selectionRow1" v-if="this.$route.query.type === 'dy'">
         </base-table>
         <el-pagination
           class="fx-pagenation"
@@ -327,6 +327,7 @@ export default {
     },
     handleCurrentChange1 (val) {
       this.current1 = val;
+      this.$refs.sbTable.handleCurrentChange();
       if (this.input4) {
         this.querygjc(val);
       } else {

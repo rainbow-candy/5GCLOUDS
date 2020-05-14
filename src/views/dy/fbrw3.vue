@@ -141,7 +141,7 @@
         </el-form-item>
       </el-form>
       <div style="position: relative;height: 468px;border-left:1px solid #ccc;" v-show="sbShow">
-        <base-table :columns="sbColumns" :data="tableData" selection height="420" @selection-change="selectionRow" style="max-width: 550px;margin-left: 70px;"></base-table>
+        <base-table ref="sbTable" :columns="sbColumns" :data="tableData" selection height="420" @selection-change="selectionRow" style="max-width: 550px;margin-left: 70px;"></base-table>
         <el-pagination
           class="fbrw-pagenation"
           @current-change="handleCurrentChange"
@@ -386,6 +386,7 @@ export default {
     // 切换分页
     handleCurrentChange (val) {
       this.current = val;
+      this.$refs.sbTable.handleCurrentChange();
       this.getList(val);
     },
     getList (page) {

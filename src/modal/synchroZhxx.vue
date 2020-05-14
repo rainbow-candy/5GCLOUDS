@@ -62,6 +62,7 @@ export default {
     },
     handleCurrentChange (val) {
       this.current = val;
+      this.$refs.sbTable.handleCurrentChange();
       this.getList(val);
     },
     submit () {

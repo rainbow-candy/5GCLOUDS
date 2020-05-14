@@ -16,7 +16,7 @@
           <i slot="prefix" class="el-input__icon el-icon-search"></i>
         </el-input>
       </div>
-      <base-table :columns="tableColumns" :data="tableData" selection height="525"  @selection-change="selectionRow">
+      <base-table ref="sbTable" :columns="tableColumns" :data="tableData" selection height="525"  @selection-change="selectionRow">
       </base-table>
       <el-pagination
         class="sp-pagenation"
@@ -119,6 +119,7 @@ export default {
       this.getList(this.val, this.input4);
     },
     handleCurrentChange (val) {
+      this.$refs.sbTable.handleCurrentChange();
       this.getList(val);
       this.val = val;
     },

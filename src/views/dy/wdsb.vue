@@ -18,7 +18,7 @@
           <i class="el-icon-refresh"></i>刷新
         </el-button>
       </div>
-      <base-table :columns="tableColumns" :data="tableData" height="525" @selection-change="selectionRow"></base-table>
+      <base-table ref="sbTable" :columns="tableColumns" :data="tableData" height="525" @selection-change="selectionRow"></base-table>
       <el-pagination
         class="sp-pagenation"
         @current-change="handleCurrentChange"
@@ -80,6 +80,7 @@ export default {
   },
   methods: {
     handleCurrentChange (val) {
+      this.$refs.sbTable.handleCurrentChange();
       this.getList(val);
       this.val = val;
     },

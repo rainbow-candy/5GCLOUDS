@@ -228,6 +228,11 @@ export default {
       this.$refs.elTable.clearSelection();
     },
 
+    // 滚动
+    handleCurrentChange () {
+      this.$refs.elTable.bodyWrapper.scrollTop = 0;
+    },
+
     //
     filterTag (value, row, column) {
       const property = column.property;
