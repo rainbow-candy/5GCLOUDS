@@ -42,7 +42,6 @@ export default {
   },
   methods: {
     beforeUpload (file, fileList) {
-      console.log(file, fileList);
       this.fileList.push(file)
     },
     handlePreview (file) {
@@ -55,7 +54,6 @@ export default {
       return this.$confirm(`确定移除 ${file.name}？`);
     },
     submit () {
-      console.log(this.fileList);
       if (this.name === '') {
         this.$message.warning('请输入文本内容')
       } else if (this.fileList.length === 0) {

@@ -60,7 +60,6 @@ export default {
             username: this.loginForm.username,
             password: crypto.encryptByDES(this.loginForm.password)
           };
-          const _this = this;
           loginServer
             .login(params)
             .then((res) => {
@@ -89,14 +88,9 @@ export default {
                   message: res.data.error
                 });
               }
-            }, function () {
-              _this.$message({
-                type: 'error',
-                message: '服务异常！'
-              });
-            })
-            .finally(() => {
-              this.loading = false;
+            }).catch(error => {
+              console.log(error.request);
+              this.$message.error('服务异常！')
             });
         }
       });

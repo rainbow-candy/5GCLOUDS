@@ -1,7 +1,7 @@
 <template>
-  <el-dialog title="选择用户" :visible.sync="dialogVisible" width="800px">
+  <el-dialog title="选择用户" :visible.sync="dialogVisible" width="800px" :before-close="cancel">
     <div style="display: flex;">
-      <el-table :data="tableData" class="sbNameTable" border stripe @row-click="selectSB" :row-class-name="tableRowClassName" style="max-width: 111px;">
+      <el-table :data="sbData" class="sbNameTable" border stripe @row-click="selectSB" :row-class-name="tableRowClassName" style="max-width: 111px;">
         <el-table-column
           label="设备"
           width="110"
@@ -13,26 +13,21 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-table :data="tableData" class="sbNameTable" border stripe>
+      <el-table :data="tableData" class="sbNameTable" border stripe @selection-change="selectionRow" row-key="id">
         <el-table-column
           type="selection"
           width="50"
-          align="center">
+          align="center"
+          :reserve-selection="true">
         </el-table-column>
         <el-table-column label="已关注用户" align="center">
           <template slot-scope="scope">
-            <span style="margin-left: 10px">{{ scope.row.name }}</span>
+            <span style="margin-left: 10px">{{ scope.row.attention }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="关键词" align="center">
-          <template slot-scope="scope">
-            <span style="margin-left: 10px">{{ scope.row.group }}</span>
-          </template>
+        <el-table-column label="关键词" align="center" prop="key_word" :filters="keyWordFilter">
         </el-table-column>
       </el-table>
-      <!--  -->
-      <!-- <base-table ref="sbTable" :columns="sbColumns" :data="tableData" selection height="380" @selection-change="selectionRow"
-      ></base-table> -->
     </div>
     <!-- <el-pagination
     class="xzyh-pagenation"
@@ -59,59 +54,44 @@ export default {
       current: 1,
       dialogVisible: false,
       checkList: [],
-      sbColumns: [
-        {
-          prop: 'name',
-          label: '设备'
-        },
-        {
-          prop: 'name1',
-          label: '已关注用户'
-        },
-        {
-          prop: 'group',
-          label: '关键词',
-          filter: true,
-          filterData: []
-        }
-      ],
+      sbData: [],
       tableData: [],
       currentCheck: {},
-      lastRow: 0
+      lastRow: 0,
+      keyWordFilter: []
     }
   },
   methods: {
-    open (data, tableData) {
+    open (data) {
+      this.sbData = [];
+      data.map(item => {
+        this.sbData.push(
+          Object.assign({}, item, { 'iconName': 'el-icon-caret-bottom' })
+        )
+      })
       this.current = 1;
       this.dialogVisible = true;
-      this.getList(this.current);
+      this.getList(1);
     },
     // 表格复选框选中
     selectionRow (data) {
       this.checkList = data;
-      this.loading = false;
     },
     tableRowClassName ({ row, rowIndex }) {
       // 把每一行的索引放进row
       row.index = rowIndex;
     },
     selectSB (row) {
-      console.log(row.index);
       if (this.lastRow !== row.index) {
-        console.log(11);
-        this.tableData[this.lastRow].iconName = 'el-icon-caret-bottom';
+        this.sbData[this.lastRow].iconName = 'el-icon-caret-bottom';
       }
       this.lastRow = row.index;
       if (row.iconName === 'el-icon-caret-bottom') {
         row.iconName = 'el-icon-caret-right';
+        this.getList(row.id)
       } else if (row.iconName === 'el-icon-caret-right') {
         row.iconName = 'el-icon-caret-bottom';
       }
-    },
-    handleCurrentChange (val) {
-      this.current = val;
-      this.$refs.sbTable.handleCurrentChange();
-      this.getList(val);
     },
     submit () {
       if (this.checkList.length === 0) {
@@ -119,53 +99,25 @@ export default {
           type: 'warning',
           message: '请勾选用户！'
         });
-        return;
-      }
-      const params = {
-        id_list: '',
-        bulk: 1,
-        synchronize: 1
-      }
-      if (this.checkList.length > 1) {
-        // 批量修改的接口
-        this.checkList.forEach(t => {
-          params.id_list += t.id + ','
-        });
-        params.id_list = params.id_list.substr(0, params.id_list.length - 1);
       } else {
-        // 单独修改的接口
-        params.id_list = this.checkList[0].id;
+        var content = '';
+        this.checkList.forEach(t => {
+          content += t.attention + '|'
+        });
+        content = content.substr(0, content.length - 1);
+        this.dialogVisible = false;
+        this.$parent.ruleForm.content = content;
       }
-      wdsbServer.putDev(params).then(res => {
-        if (res.status === 200) {
-          this.dialogVisible = false;
-          this.$message({
-            message: res.data.msg,
-            type: 'success'
-          });
-          this.$parent.getList();
-        }
-      })
     },
     // 取消
     cancel () {
       this.dialogVisible = false;
       this.$parent.zbjzf('0');
     },
-    // 重新勾选
-    reSelect () {
-      setTimeout(() => {
-        if (this.currentCheck[this.current - 1]) {
-          this.currentCheck[this.current - 1].forEach((row) => {
-            this.$refs.sbTable.toggleSelection(row, true);
-          });
-        }
-      }, 500);
-    },
-    getList (page) {
+    getList (id) {
       this.tableData = [];
       const _this = this;
-      wdsbServer.myDev({ mydev: 1, page: page }).then(res => {
+      wdsbServer.forward({ zbzf: id }).then(res => {
         if (res.status === 200) {
           if (res.data.results.length > 0) {
             this.total = res.data.count;
@@ -175,7 +127,6 @@ export default {
               )
             })
             this.getFilterData(this.tableData);
-            this.reSelect();
           }
         }
       }, function () {
@@ -190,13 +141,13 @@ export default {
       // 空对象
       var obj = {}
       const newData = data.concat();
-      this.sbColumns[2].filterData = [];
+      this.keyWordFilter = [];
       // 遍历
       for (var i = 0; i < newData.length; i++) {
-        if (newData[i].group) {
-          if (obj[newData[i].group] === undefined) {
+        if (newData[i].key_word) {
+          if (obj[newData[i].key_word] === undefined) {
             // 随便贴一个不为空的值
-            obj[newData[i].group] = 1;
+            obj[newData[i].key_word] = 1;
           } else {
             newData.splice(i--, 1)
           }
@@ -205,8 +156,8 @@ export default {
         }
       }
       newData.forEach((item, index) => {
-        this.sbColumns[2].filterData.push(
-          Object.assign({}, item, { text: item.group, value: item.group })
+        this.keyWordFilter.push(
+          Object.assign({}, item, { text: item.key_word, value: item.key_word })
         )
       })
     }
@@ -237,7 +188,13 @@ export default {
 .base-table {
   height: 380px;
 }
-.sbNameTable {
-
+/deep/ .el-table__empty-text {
+  width: 100%;
+}
+/deep/ .el-table__column-filter-trigger {
+  line-height: 20px;
+  i {
+    font-size: 18px;
+  }
 }
 </style>

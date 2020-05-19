@@ -8,12 +8,7 @@
     </div>
     <div class="content">
       <el-row>
-        <el-col v-for="(item, index) in colList1" :key="index" :xs="12" :sm="6">
-          <img :src="item.src" alt="" @click="publishTask(item.src, item.label)">
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-col v-for="(item, index) in colList2" :key="index" :xs="12" :sm="6">
+        <el-col v-for="(item, index) in colList1" :key="index" :xs="12" :sm="8">
           <img :src="item.src" alt="" @click="publishTask(item.src, item.label)" :class="item.name">
         </el-col>
       </el-row>
@@ -22,24 +17,28 @@
 </template>
 
 <script>
+import wdsbServer from '@/api/wdsb-server.js';
 
 export default {
   data () {
     return {
       colList1: [{
+        src: require('@/assets/imgs/czyh.png'),
+        label: '垂直养号'
+      }, {
         src: require('@/assets/imgs/tjdz.png'),
         label: '推荐点赞'
       }, {
         src: require('@/assets/imgs/tcdz.png'),
-        label: '同城点赞'
+        label: '同城点赞',
+        name: 'tcdz'
       }, {
         src: require('@/assets/imgs/ssgz.png'),
         label: '搜索关注'
       }, {
         src: require('@/assets/imgs/fsgz.png'),
         label: '粉丝关注'
-      }],
-      colList2: [{
+      }, {
         src: require('@/assets/imgs/zfpl.png'),
         label: '转发评论'
       }, {
@@ -65,6 +64,8 @@ export default {
         path: '/publishTask2',
         query: { src: src, type: 'dy', name: label }
       });
+      wdsbServer.clicknum({ task_name: label }).then(res => {
+      })
     }
   }
 }
@@ -72,7 +73,7 @@ export default {
 
 <style lang="less" scoped>
 .box {
-  padding: 120px 40px 0 40px;
+  padding: 100px 10% 0 10%;
   width: 90%;
   margin-left: 5%;
   .content-title {
@@ -86,12 +87,12 @@ export default {
   margin-top: 30px;
   .el-col {
     text-align: center;
-    padding: 30px 0;
+    padding: 20px 0;
     img {
-      width: 170px;
+      width: 150px;
     }
     .zdzf {
-      width: 179px;
+      width: 155px;
     }
   }
 }
@@ -104,7 +105,10 @@ export default {
         width: 95px;
       }
       .zdzf {
-        width: 103px;
+        width: 100px;
+      }
+      .tcdz {
+        width: 94px;
       }
     }
   }

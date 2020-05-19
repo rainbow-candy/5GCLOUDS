@@ -75,7 +75,8 @@ export default {
       ],
       tableData: [],
       selectTableRow: [],
-      val: 1
+      val: 1,
+      timers: null
     }
   },
   methods: {
@@ -158,11 +159,23 @@ export default {
       })
     }
   },
-  mounted () {
+  created () {
     this.getList();
-    // window.setInterval(() => {
-    //   setTimeout(this.getList(), 0);
-    // }, 1000);
+  },
+  // 销毁后
+  destroyed () {
+    clearTimeout(this.timers);
+  },
+  // 监听
+  watch: {
+    tableData () {
+      if (this.timers) {
+        clearTimeout(this.timers);
+      }
+      this.timers = setTimeout(() => {
+        this.getList(this.val);
+      }, 2000);
+    }
   }
 }
 </script>

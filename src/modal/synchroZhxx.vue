@@ -83,7 +83,6 @@ export default {
       });
       params.id_list = params.id_list.substr(0, params.id_list.length - 1);
       wdsbServer.putDev(params).then(res => {
-        console.log(res)
         if (res.status === 200) {
           this.dialogVisible = false;
           this.$message({

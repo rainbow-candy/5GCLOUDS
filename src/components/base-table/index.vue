@@ -183,12 +183,23 @@ export default {
     }
   },
   methods: {
+    // 日期填充0
+    dataAdd0 (value) {
+      if (value >= 10) {
+        return value;
+      } else {
+        return '0' + value;
+      }
+    },
     // 单元格数据格式化
     formatData (column, row) {
       const value = row[column.prop];
       if (value) {
         if (column.type === 'date') {
           return format(value, column.dateFormat || 'yyyy-MM-dd HH:mm:ss');
+        } else if (column.type === 'time') {
+          var d = new Date(value);
+          return d.getFullYear() + '-' + this.dataAdd0(d.getMonth() + 1) + '-' + this.dataAdd0(d.getDate()) + ' ' + this.dataAdd0(d.getHours()) + ':' + this.dataAdd0(d.getMinutes()) + ':' + this.dataAdd0(d.getSeconds());
         } else if (column.formatter instanceof Function) {
           return column.formatter(value);
         } else {
@@ -233,7 +244,6 @@ export default {
       this.$refs.elTable.bodyWrapper.scrollTop = 0;
     },
 
-    //
     filterTag (value, row, column) {
       const property = column.property;
       return row[property] === value;

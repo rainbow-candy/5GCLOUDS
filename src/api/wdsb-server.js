@@ -17,6 +17,10 @@ const wdsbServer = {
   suspendDev (params) {
     return fetch('api/task/dev/', 'post', params)
   },
+  // 八大功能点击量
+  clicknum (params) {
+    return fetch('api/task/clicknum/', 'post', params)
+  },
   // 关键词摘取
   kwordSearch (params) {
     return fetch('api/task/kword/', 'post', params)
@@ -40,6 +44,10 @@ const wdsbServer = {
   // 信息反馈
   feedback (params) {
     return fetch('api/user/feedback/', 'post', params)
+  },
+  // 直播间转发
+  forward (params) {
+    return fetch('api/task/kword/', 'get', params)
   }
 };
 

@@ -20,6 +20,9 @@
         <el-button class="refresh-btn" type="danger"  @click="deletes" :disabled="selectTableRow.length === 0">
           <i class="el-icon-delete"></i>批量删除
         </el-button>
+        <el-button class="refresh-btn" @click="getList(val)">
+          <i class="el-icon-refresh"></i>刷新
+        </el-button>
       </div>
       <base-table :columns="tableColumns" :data="tableData" ref="baseTable" selection height="525" @selection-change="selectionRow">
         <el-table-column label="操作" width="200">
@@ -35,13 +38,14 @@
         class="sp-pagenation"
         @current-change="handleCurrentChange"
         @size-change="handleSizeChange"
+        :current-page="val"
         :page-sizes="[10, 20, 50]"
         :page-size="10"
         layout="prev, pager, next, total, sizes, jumper"
         :total="total"
       >
       </el-pagination>
-      <p>温馨提示：任务列表保存近一周的数据</p>
+      <p>温馨提示：任务列表仅保留设备最近的三条任务</p>
       <checkTask ref="checkTask"></checkTask>
     </div>
   </div>
@@ -77,6 +81,10 @@ export default {
           prop: 'task_nick',
           label: '任务昵称',
           filter: true,
+          // filterTag: row => {
+          //   console.log(row);
+          //   // this.getList(this.val, row);
+          // },
           filterData: [],
           minWidth: 130
         },
@@ -84,19 +92,25 @@ export default {
           prop: 'task_date',
           label: '创建时间',
           sortable: true,
-          minWidth: 130
+          minWidth: 130,
+          type: 'time'
         },
         {
           prop: 'zt',
           label: '工作状态',
           filter: true,
           filterData: [],
+          // filterTag: (row) => {
+          //   console.log(row)
+          // },
           backColor: true,
           minWidth: 130
         }
       ],
       selectTableRow: [],
-      tableData: []
+      tableData: [],
+      // 定时器
+      timers: null
     }
   },
   methods: {
@@ -110,13 +124,18 @@ export default {
     },
     // 继续
     startRow (row) {
-      this.$confirm('是否确认继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.suspendVideo(row.key, { stop_task: 1 });
-      })
+      console.log(row);
+      if (row.online === 0) {
+        this.$message.warning('该设备已离线，请打开APP开启！')
+      } else {
+        this.$confirm('是否确认继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.suspendVideo(row.key, { stop_task: 1 });
+        })
+      }
     },
     // 停止
     suspendRow (row) {
@@ -125,7 +144,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.suspendVideo(row.key, { stop_task: 0 });
+        this.suspendVideo(row.key, { stop_task: 2 });
       })
     },
     // 批量停止
@@ -140,7 +159,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.suspendVideo(ids, { stop_task: 0 });
+        this.suspendVideo(ids, { stop_task: 2 });
       })
     },
     // 删除当前行
@@ -232,8 +251,9 @@ export default {
     },
     handleSizeChange (val) {
       this.page_size = val;
-      this.getList(1);
+      this.getList(this.val);
     },
+    // 筛选列表
     // 获取列表
     getList (page) {
       wdsbServer.myDev({ task: '1', app_type: this.$route.query.type, page: page, page_size: this.page_size }).then(res => {
@@ -261,10 +281,6 @@ export default {
             // 分组
             this.tableColumns[0].filterData = this.getFilter(this.tableData, 'name');
             this.tableColumns[1].filterData = this.getFilter(this.tableData, 'group');
-            this.tableColumns[2].filterData = this.getFilter(this.tableData, 'task_nick');
-            this.tableColumns[4].filterData = this.getFilter(this.tableData, 'zt');
-            this.selectTableRow = [];
-            this.$refs.baseTable.clearSelection();
           } else {
             this.tableData = []
           }
@@ -290,10 +306,81 @@ export default {
         )
       })
       return Arr1;
+    },
+    getSBList () {
+      wdsbServer.myDev({ mydev_online: 1 }).then(res => {
+        if (res.status === 200) {
+          res.data.results.forEach((t) => {
+            if (t.online === 1) {
+              t.online = '在线';
+            } else {
+              t.online = '离线';
+            }
+          });
+          this.tableData = res.data.results;
+          this.total = res.data.count;
+          this.getFilterData(this.tableData);
+        }
+      })
     }
   },
-  mounted () {
-    this.getList(1);
+  // 实例创建完成
+  created () {
+    this.getList();
+    // this.getSBList()
+    this.tableColumns[2].filterData = [{
+      value: '推荐点赞',
+      text: '推荐点赞'
+    }, {
+      value: '同城点赞',
+      text: '同城点赞'
+    }, {
+      value: '搜索关注',
+      text: '搜索关注'
+    }, {
+      value: '粉丝关注',
+      text: '粉丝关注'
+    }, {
+      value: '转发评论',
+      text: '转发评论'
+    }, {
+      value: '指定转发评论',
+      text: '指定转发评论'
+    }, {
+      value: '直播助力',
+      text: '直播助力'
+    }, {
+      value: '上传视频',
+      text: '上传视频'
+    }];
+    this.tableColumns[4].filterData = [{
+      value: '0',
+      text: '未执行'
+    }, {
+      value: '1',
+      text: '正在执行'
+    }, {
+      value: '2',
+      text: '执行失败'
+    }, {
+      value: '3',
+      text: '执行成功'
+    }];
+  },
+  // 销毁后
+  destroyed () {
+    clearTimeout(this.timers);
+  },
+  // 监听
+  watch: {
+    tableData () {
+      if (this.timers) {
+        clearTimeout(this.timers);
+      }
+      this.timers = setTimeout(() => {
+        this.getList(this.val);
+      }, 2000);
+    }
   }
 }
 </script>

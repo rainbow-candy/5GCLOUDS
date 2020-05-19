@@ -1,5 +1,17 @@
 <template>
   <el-dialog title="查看详情" :visible.sync="dialogVisible" :width="dialogWidth">
+    <!-- 垂直点赞 -->
+    <el-form label-width="120px" v-if="form.task_nick === '垂直养号'">
+      <div class="check1">搜索大类：{{form.search_str}}</div>
+      <el-form-item label="点赞数量：">
+        <p>{{form.to_num}}</p>
+      </el-form-item>
+      <div class="check1" v-if="!form.to_file">评论内容：{{form.content ? form.content : zero}}</div>
+      <el-form-item label="评论内容：" v-if="form.to_file">
+        <a :href="form.to_file" title="点击下载文件查看评论内容">{{form.to_file}}</a>
+      </el-form-item>
+    </el-form>
+
     <!-- 点赞 -->
     <el-form label-width="120px" v-if="form.task_nick === '推荐点赞' || form.task_nick === '同城点赞'">
       <el-form-item label="点赞数量：">
@@ -90,12 +102,10 @@ export default {
       this.form = data;
       if (this.form.task_nick === '上传视频') {
         const arr = this.form.content.split(',,,,,');
-        console.log(arr);
         this.form.content1 = arr[0];
         this.form.content2 = arr[1];
         this.form.content3 = arr[2];
       }
-      console.log(data);
     }
   },
   mounted () {
