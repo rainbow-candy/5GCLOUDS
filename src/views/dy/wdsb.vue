@@ -18,11 +18,14 @@
           <i class="el-icon-refresh"></i>刷新
         </el-button>
       </div>
-      <base-table ref="sbTable" :columns="tableColumns" :data="tableData" height="525" @selection-change="selectionRow"></base-table>
+      <base-table ref="sbTable" :columns="tableColumns" :data="tableData" height="528" @selection-change="selectionRow" @renderHearder="renderHearder"></base-table>
       <el-pagination
         class="sp-pagenation"
         @current-change="handleCurrentChange"
-        layout="prev, pager, next, total, jumper"
+        @size-change="handleSizeChange"
+        :page-sizes="[10, 20, 50]"
+        :page-size="10"
+        layout="prev, pager, next, total, sizes"
         :total="total"
       >
       </el-pagination>
@@ -61,8 +64,9 @@ export default {
         {
           prop: 'stats',
           label: '工作状态',
-          sortable: true,
+          filter: true,
           backColor: true,
+          filterData: [],
           minWidth: 120
         },
         {
@@ -76,7 +80,9 @@ export default {
       tableData: [],
       selectTableRow: [],
       val: 1,
-      timers: null
+      timers: null,
+      parms: {},
+      page_size: 10
     }
   },
   methods: {
@@ -95,34 +101,32 @@ export default {
     selectionRow (data) {
       this.selectTableRow = data;
     },
-    // 获取筛选数组
-    getFilterData (data) {
-      // 空对象
-      var obj = {}
-      this.tableColumns[2].filterData = [];
-      const newData = data.concat();
-      // 遍历
-      for (var i = 0; i < newData.length; i++) {
-        if (newData[i].group) {
-          if (obj[newData[i].group] === undefined) {
-            // 随便贴一个不为空的值
-            obj[newData[i].group] = 1;
-          } else {
-            newData.splice(i--, 1)
-          }
-        } else {
-          newData.splice(i--, 1)
-        }
+    // 筛选列表
+    renderHearder (key, label) {
+      // { [key]: label }
+      if (key === 'zt') {
+        key = 'stats';
       }
-      newData.forEach((item, index) => {
-        this.tableColumns[2].filterData.push(
-          Object.assign({}, item, { text: item.group, value: item.group })
-        )
-      })
+      this.val = 1;
+      this.getList(1, key, label);
     },
-    getList (page) {
-      const _this = this;
-      wdsbServer.myDev({ mydev: 1, page: page }).then(res => {
+    // 分页
+    handleSizeChange (val) {
+      this.page_size = val;
+      this.getList(this.val);
+    },
+    getList (page, key, label) {
+      var parms = {
+        mydev: 1,
+        page: page,
+        page_size: this.page_size
+      }
+      if (key) {
+        this.parms = {};
+        this.parms[key] = label;
+      }
+      parms = Object.assign({}, parms, this.parms);
+      wdsbServer.myDev(parms).then(res => {
         if (res.status === 200) {
           if (res.data.results.length > 0) {
             const datas = res.data.results;
@@ -148,19 +152,50 @@ export default {
               }
             });
             this.tableData = datas;
-            this.getFilterData(this.tableData);
+          } else {
+            this.total = 0;
+            this.tableData = [];
           }
         }
-      }, function () {
-        _this.$message({
-          type: 'error',
-          message: '服务异常！'
-        });
+      });
+    },
+    getFZList () {
+      wdsbServer.myDev({ task: 1, is_group: 1, page_size: 100 }).then(res => {
+        if (res.status === 200) {
+          this.tableColumns[2].filterData = [];
+          if (res.data.results.length > 0 && res.data.results[0].group !== null) {
+            res.data.results.forEach((item) => {
+              this.tableColumns[2].filterData.push(
+                Object.assign({}, { value: item.group, text: item.group })
+              )
+            });
+            this.tableColumns[1].filterData.unshift({ value: '', text: '全部' });
+          } else {
+            this.tableColumns[2].filterData = [];
+          }
+        }
       })
     }
   },
   created () {
     this.getList();
+    this.getFZList();
+    this.tableColumns[3].filterData = [{
+      value: '',
+      text: '全部'
+    }, {
+      value: '0',
+      text: '未执行'
+    }, {
+      value: '1',
+      text: '正在执行'
+    }, {
+      value: '2',
+      text: '执行失败'
+    }, {
+      value: '3',
+      text: '执行成功'
+    }];
   },
   // 销毁后
   destroyed () {

@@ -40,7 +40,7 @@
             <el-radio v-model="radio" label="2">批量上传</el-radio>
             <el-input type="textarea" v-model="ruleForm.content" :rows="2" :maxlength="maxlength" show-word-limit placeholder="评论条数以“|”分隔" @input="plnrChange" v-if="radio === '1'"></el-input>
             <div class="plnr" v-if="radio === '2'">
-              <div class="xzmb" @click="xzmb">下载评论模板</div>
+              <div class="xzmb" @click="xzmb"><i class="el-icon-download"></i>下载评论模板</div>
               <el-upload
                 class="upload-demo"
                 action="http://112.74.103.26/api/task/dev/"
@@ -53,7 +53,7 @@
                 :on-exceed="handleExceed"
                 accept=".xls, .xlsx"
                 :file-list="fileList">
-                <div class="xzmb">上传评论模板</div>
+                <div class="xzmb"><i class="el-icon-upload2"></i>上传评论模板</div>
                 </el-upload>
             </div>
           </el-form-item>
@@ -74,7 +74,7 @@
           </el-form-item>
           <el-form-item label="弹幕文案：">
             <div class="plnr">
-              <div class="xzmb" @click="xzmb">下载弹幕模板</div>
+              <div class="xzmb" @click="xzmb"><i class="el-icon-download"></i>下载弹幕模板</div>
               <el-upload
                 class="upload-demo"
                 action="http://112.74.103.26/api/task/dev/"
@@ -87,7 +87,7 @@
                 :on-exceed="handleExceed"
                 accept=".xls, .xlsx"
                 :file-list="fileList">
-                <div class="xzmb">上传弹幕模板</div>
+                <div class="xzmb"><i class="el-icon-upload2"></i>上传弹幕模板</div>
                 </el-upload>
             </div>
           </el-form-item>
@@ -441,11 +441,11 @@ export default {
     // 下载文件模板
     xzmb () {
       if (this.$route.query.name.indexOf('点赞') !== -1 || this.$route.query.name === '垂直养号') {
-        window.open('http://192.168.1.52:8888/media/dz.xlsx', '_self');
+        window.open('http://112.74.103.26/media/dz.xlsx', '_self');
       } else if (this.$route.query.name.indexOf('转发评论') !== -1) {
-        window.open('http://192.168.1.52:8888/media/zfpl.xlsx', '_self');
+        window.open('http://112.74.103.26/media/zfpl.xlsx', '_self');
       } else {
-        window.open('http://192.168.1.52:8888/media/zbzl.xlsx', '_self');
+        window.open('http://112.74.103.26/media/zbzl.xlsx', '_self');
       }
     },
     // 上传视频
@@ -458,6 +458,12 @@ export default {
           }
         } else if (this.$route.query.name === '上传视频') {
           this.$message.warning('请上传文件');
+          return;
+        }
+      }
+      if (this.$route.query.name.indexOf('转发评论') !== -1 && this.radio === '1') {
+        if (this.ruleForm.content === '') {
+          this.$message.warning('请输入评论内容');
           return;
         }
       }
@@ -504,8 +510,8 @@ export default {
       formData.append('to_file', this.toFileList[0]);
       formData.append('bulk', 1);
       formData.append('at_me', this.ruleForm.at_me);
-      // const url = 'http://112.74.103.26/api/task/dev/';
-      const url = 'http://192.168.1.52:8888/api/task/dev/';
+      const url = 'http://112.74.103.26/api/task/dev/';
+      // const url = 'http://192.168.1.52:8888/api/task/dev/';
       this.makeXMLHttpRequest(url, formData, this);
     },
 
@@ -673,8 +679,10 @@ export default {
     .djsc {
       width: 200px;
     }
-    .xzmb {
-      width: 95px;
+    .plnr {
+      .xzmb {
+        width: 100px;
+      }
     }
     /deep/ .el-upload-list {
       margin-left: -100px;

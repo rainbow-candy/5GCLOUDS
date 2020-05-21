@@ -7,8 +7,9 @@
         <p>{{form.to_num}}</p>
       </el-form-item>
       <div class="check1" v-if="!form.to_file">评论内容：{{form.content ? form.content : zero}}</div>
+      <div class="check1" v-if="!form.to_file">@好友：{{form.at_me ? form.at_me : zero}}</div>
       <el-form-item label="评论内容：" v-if="form.to_file">
-        <a :href="form.to_file" title="点击下载文件查看评论内容">{{form.to_file}}</a>
+        <a :href="form.to_file">点击下载文件查看评论内容</a>
       </el-form-item>
     </el-form>
 
@@ -18,8 +19,9 @@
         <p>{{form.to_num}}</p>
       </el-form-item>
       <div class="check1" v-if="!form.to_file">评论内容：{{form.content ? form.content : zero}}</div>
+      <div class="check1" v-if="!form.to_file">@好友：{{form.at_me ? form.at_me : zero}}</div>
       <el-form-item label="评论内容：" v-if="form.to_file">
-        <a :href="form.to_file" title="点击下载文件查看评论内容">{{form.to_file}}</a>
+        <a :href="form.to_file">点击下载文件查看评论内容</a>
       </el-form-item>
     </el-form>
 
@@ -40,17 +42,23 @@
       <el-form-item label="转发数量：">
         <p>{{form.to_num}}</p>
       </el-form-item>
-      <div class="check1">@好友：{{form.content ? form.content : zero}}</div>
+      <div class="check1" v-if="!form.to_file">@好友：{{form.at_me ? form.at_me : zero}}</div>
+      <el-form-item label="评论内容：" v-if="form.to_file">
+        <a :href="form.to_file">点击下载文件查看评论内容</a>
+      </el-form-item>
     </el-form>
 
     <!-- 直播 -->
     <el-form label-width="120px" v-if="form.task_nick === '直播助力'">
       <div class="check1">抖音号：{{form.search_str}}</div>
       <div class="check1">观看时间：{{form.to_num}}</div>
-      <div class="check1">弹幕文案：{{form.to_file ? form.to_file : zero}}</div>
+      <div class="check1" v-if="!form.to_file">弹幕文案：{{zero}}</div>
+      <el-form-item label="弹幕文案：" v-if="form.to_file">
+        <a :href="form.to_file">点击下载文件查看弹幕内容</a>
+      </el-form-item>
     </el-form>
 
-    <!-- 直播 -->
+    <!-- 上传视频 -->
     <el-form label-width="120px" v-if="form.task_nick === '上传视频'">
       <div class="check1">视频文本：{{form.content1}}</div>
       <div class="check1">#话题：{{form.content2 ? form.content2 : zero}}</div>
@@ -134,8 +142,9 @@ export default {
   }
 }
 .check1 {
-  margin-left: 38px;
-  margin-bottom: 1rem;
+  margin: 0 2rem 1rem 38px;
+  height: 30px;
+  line-height: 30px;
 }
 .el-icon-plus {
     height: 30px;

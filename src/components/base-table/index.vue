@@ -81,8 +81,8 @@
         :width="item.width"
         :min-width="item.minWidth"
         :sortable="item.sortable"
-        :filters="item.filterData"
-        :filter-method="filterTag"
+        :filterList="item.filterData"
+        :render-header="(h, obj) => renderHeader(h, obj, item)"
         show-overflow-tooltip
         align="center"
       >
@@ -247,6 +247,47 @@ export default {
     filterTag (value, row, column) {
       const property = column.property;
       return row[property] === value;
+    },
+
+    renderHeader (h, { column, $index }, item) {
+      const filters = item.filterData;
+      return h('div', [
+        h('span', column.label),
+        // h('i', {
+        //   class: 'el-icon-arrow-down',
+        //   style: 'color:#C0C4CC;margin-left:5px;cursor: pointer;',
+        //   on: {
+        //     click: () => {
+        //       this.$emit('renderHearder', column.property);
+        //     }
+        //   }
+        // }),
+        h('el-select', {
+          // el-select实现下拉框
+          on: {
+            input: value => {
+              // 随着下拉框的不同，文字框里的内容在边
+              this.logLevel = column.value;
+              this.$emit('renderHearder', column.property, value);
+            }
+          },
+          props: {
+            // 文字框的内容取决于这个value，如果value不存在，会报错
+            value: this.logLevel
+          }
+        },
+        [
+          // 下拉框里面填充选项，通过filters遍历map，为每一个选项赋值。
+          filters.map(item => {
+            return h('el-option', {
+              props: {
+                value: item.value,
+                label: item.text
+              }
+            });
+          })
+        ])
+      ])
     }
   }
 };
@@ -298,5 +339,14 @@ export default {
 }
 /deep/ .el-table__column-filter-trigger i {
   font-size: 20px;
+}
+/deep/ .el-input {
+  width: 9px;
+  /deep/ .el-input__inner {
+    border: none;
+  }
+  /deep/ .el-input__suffix {
+    right: -18px;
+  }
 }
 </style>

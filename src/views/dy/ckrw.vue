@@ -24,7 +24,7 @@
           <i class="el-icon-refresh"></i>刷新
         </el-button>
       </div>
-      <base-table :columns="tableColumns" :data="tableData" ref="baseTable" selection height="525" @selection-change="selectionRow">
+      <base-table :columns="tableColumns" :data="tableData" ref="baseTable" selection height="528" @selection-change="selectionRow" @renderHearder="renderHearder">
         <el-table-column label="操作" width="200">
           <template slot-scope="scope">
             <el-button type="text" icon="el-icon-view" @click="checkRow(scope.row)">详情</el-button>
@@ -81,10 +81,6 @@ export default {
           prop: 'task_nick',
           label: '任务昵称',
           filter: true,
-          // filterTag: row => {
-          //   console.log(row);
-          //   // this.getList(this.val, row);
-          // },
           filterData: [],
           minWidth: 130
         },
@@ -100,9 +96,6 @@ export default {
           label: '工作状态',
           filter: true,
           filterData: [],
-          // filterTag: (row) => {
-          //   console.log(row)
-          // },
           backColor: true,
           minWidth: 130
         }
@@ -110,7 +103,8 @@ export default {
       selectTableRow: [],
       tableData: [],
       // 定时器
-      timers: null
+      timers: null,
+      parms: {}
     }
   },
   methods: {
@@ -244,19 +238,45 @@ export default {
         }
       })
     },
+    // 切换条数
     handleCurrentChange (val) {
       this.getList(val);
       this.val = val;
       this.$refs.baseTable.handleCurrentChange();
     },
+    // 分页
     handleSizeChange (val) {
+      console.log(this.parms)
       this.page_size = val;
       this.getList(this.val);
     },
     // 筛选列表
+    renderHearder (key, label) {
+      // { [key]: label }
+      if (key === 'zt') {
+        key = 'stats';
+      }
+      this.val = 1;
+      this.getList(1, key, label);
+    },
     // 获取列表
-    getList (page) {
-      wdsbServer.myDev({ task: '1', app_type: this.$route.query.type, page: page, page_size: this.page_size }).then(res => {
+    getList (page, key, label) {
+      const parms = {
+        task: '1',
+        app_type: this.$route.query.type,
+        page: page,
+        page_size: this.page_size
+      }
+      if (key) {
+        this.parms = {};
+        console.log(1)
+        this.parms[key] = label;
+      }
+      this.getList1(parms);
+    },
+    getList1 (parms) {
+      parms = Object.assign({}, parms, this.parms);
+      wdsbServer.myDev(parms).then(res => {
         if (res.status === 200) {
           if (res.data.results.length > 0) {
             const datas = res.data.results;
@@ -278,10 +298,8 @@ export default {
               t.key = t.id;
             });
             this.tableData = datas;
-            // 分组
-            this.tableColumns[0].filterData = this.getFilter(this.tableData, 'name');
-            this.tableColumns[1].filterData = this.getFilter(this.tableData, 'group');
           } else {
+            this.total = 0;
             this.tableData = []
           }
         }
@@ -308,18 +326,36 @@ export default {
       return Arr1;
     },
     getSBList () {
-      wdsbServer.myDev({ mydev_online: 1 }).then(res => {
+      wdsbServer.myDev({ task: 1, app_type: this.$route.query.type, is_name: 1, page_size: 100 }).then(res => {
         if (res.status === 200) {
-          res.data.results.forEach((t) => {
-            if (t.online === 1) {
-              t.online = '在线';
-            } else {
-              t.online = '离线';
-            }
-          });
-          this.tableData = res.data.results;
-          this.total = res.data.count;
-          this.getFilterData(this.tableData);
+          this.tableColumns[0].filterData = [];
+          if (res.data.results.length > 0) {
+            res.data.results.forEach((item) => {
+              this.tableColumns[0].filterData.push(
+                Object.assign({}, { value: item.name, text: item.name })
+              )
+            });
+            this.tableColumns[0].filterData.unshift({ value: '', text: '全部' });
+          } else {
+            this.tableColumns[0].filterData = [];
+          }
+        }
+      })
+    },
+    getFZList () {
+      wdsbServer.myDev({ task: 1, app_type: this.$route.query.type, is_group: 1, page_size: 100 }).then(res => {
+        if (res.status === 200) {
+          this.tableColumns[1].filterData = [];
+          if (res.data.results.length > 0 && res.data.results[0].group !== null) {
+            res.data.results.forEach((item) => {
+              this.tableColumns[1].filterData.push(
+                Object.assign({}, { value: item.group, text: item.group })
+              )
+            });
+            this.tableColumns[1].filterData.unshift({ value: '', text: '全部' });
+          } else {
+            this.tableColumns[1].filterData = [];
+          }
         }
       })
     }
@@ -327,8 +363,15 @@ export default {
   // 实例创建完成
   created () {
     this.getList();
-    // this.getSBList()
+    this.getSBList();
+    this.getFZList();
     this.tableColumns[2].filterData = [{
+      value: '',
+      text: '全部'
+    }, {
+      value: '垂直养号',
+      text: '垂直养号'
+    }, {
       value: '推荐点赞',
       text: '推荐点赞'
     }, {
@@ -354,6 +397,9 @@ export default {
       text: '上传视频'
     }];
     this.tableColumns[4].filterData = [{
+      value: '',
+      text: '全部'
+    }, {
       value: '0',
       text: '未执行'
     }, {
@@ -379,7 +425,7 @@ export default {
       }
       this.timers = setTimeout(() => {
         this.getList(this.val);
-      }, 2000);
+      }, 15000);
     }
   }
 }

@@ -90,7 +90,7 @@ export default {
               }
             }).catch(error => {
               console.log(error.request);
-              this.$message.error('服务异常！')
+              this.$message.error(error.request.response);
             });
         }
       });

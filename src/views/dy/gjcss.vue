@@ -432,9 +432,6 @@ export default {
   }
   .gjcForm {
     width: 550px;
-    /deep/ .el-select {
-      width: 100%;
-    }
     /deep/ .el-form-item__label {
       color: black;
       font-weight: 600;
@@ -491,10 +488,6 @@ export default {
       margin-top: 15px;
       color: #9c9a9a;
     }
-  }
-  /deep/ .el-select .el-input .el-select__caret {
-    margin-right: 20px;
-    color: #fff;
   }
   .required {
     position: relative;
