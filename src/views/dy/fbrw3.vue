@@ -220,6 +220,7 @@ export default {
       selectTableRow: [],
       total: 0,
       page_size: 10,
+      timers: null,
       pickerOptions: {
         disabledDate (time) {
           return time.getTime() < Date.now() - 8.64e7;
@@ -357,7 +358,7 @@ export default {
             this.$message({
               message: res.data,
               type: 'error',
-              duration: 3000,
+              duration: 10000,
               showClose: true
             });
           }
@@ -529,7 +530,7 @@ export default {
               _this.$message({
                 message: request.response,
                 type: 'error',
-                duration: 3000,
+                duration: 10000,
                 showClose: true
               });
             }
@@ -552,6 +553,21 @@ export default {
   },
   mounted () {
     this.getList(1);
+  },
+  // 销毁后
+  destroyed () {
+    clearTimeout(this.timers);
+  },
+  // 监听
+  watch: {
+    tableData () {
+      if (this.timers) {
+        clearTimeout(this.timers);
+      }
+      this.timers = setTimeout(() => {
+        this.getList(this.current);
+      }, 3000);
+    }
   }
 }
 </script>

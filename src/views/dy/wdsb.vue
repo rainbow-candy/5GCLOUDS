@@ -209,7 +209,7 @@ export default {
       }
       this.timers = setTimeout(() => {
         this.getList(this.val);
-      }, 2000);
+      }, 3000);
     }
   }
 }
