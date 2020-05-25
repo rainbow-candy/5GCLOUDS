@@ -1,7 +1,7 @@
 <template>
   <el-dialog title="选择用户" :visible.sync="dialogVisible" width="800px" :before-close="cancel">
     <div style="display: flex;">
-      <el-table :data="sbData" class="sbNameTable" border stripe @row-click="selectSB" :row-class-name="tableRowClassName" style="max-width: 111px;">
+      <el-table :data="sbData" class="sbNameTable" border stripe @row-click="selectSB" :row-class-name="tableRowClassName" style="max-width: 111px;" max-height="380px">
         <el-table-column
           label="设备"
           width="110"
@@ -13,7 +13,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-table :data="tableData" class="sbNameTable" border stripe @selection-change="selectionRow" row-key="id">
+      <el-table :data="tableData" class="sbNameTable" border stripe @selection-change="selectionRow" row-key="id" max-height="380px">
         <el-table-column
           type="selection"
           width="50"

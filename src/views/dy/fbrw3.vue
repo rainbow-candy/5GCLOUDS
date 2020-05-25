@@ -101,10 +101,10 @@
             <el-input v-model="ruleForm.spwb" maxlength="30" show-word-limit placeholder="请输入视频文本"></el-input>
           </el-form-item>
           <el-form-item label="#话题：">
-            <el-input v-model="ruleForm.spht" maxlength="10" show-word-limit @input="htKeyup" placeholder="禁止输入特殊字符和空格"></el-input>
+            <el-input v-model="ruleForm.search_str" maxlength="10" show-word-limit @input="htKeyup" placeholder="请勿输入特殊字符和空格"></el-input>
           </el-form-item>
           <el-form-item label="@好友：">
-            <el-input v-model="ruleForm.sphy" maxlength="10" show-word-limit @input="hyKeyup" placeholder="禁止输入特殊字符和空格"></el-input>
+            <el-input v-model="ruleForm.at_me" maxlength="10" show-word-limit placeholder="请勿输入特殊字符和空格"></el-input>
           </el-form-item>
           <div class="required">*</div><el-form-item label="视频素材：">
             <el-upload
@@ -135,11 +135,12 @@
             v-show="timing"
             type="datetime"
             :picker-options="pickerOptions"
-            placeholder="选择执行时间">
+            placeholder="选择执行时间"
+            value-format="yyyy-MM-dd HH:mm:ss">
           </el-date-picker>
         </el-form-item>
         <el-form-item>
-          <el-button class="zxBtn" @click="onSubmit" :disabled="selectTableRow.length === 0">执行</el-button>
+          <el-button class="zxBtn" @click="debounce" :disabled="selectTableRow.length === 0">执行</el-button>
         </el-form-item>
       </el-form>
       <div style="position: relative;height: 468px;border-left:1px solid #ccc;" v-show="sbShow">
@@ -180,8 +181,6 @@ export default {
         to_num: '',
         content: '',
         spwb: '',
-        spht: '',
-        sphy: '',
         at_me: ''
       },
       fileList: [],
@@ -221,6 +220,7 @@ export default {
       total: 0,
       page_size: 10,
       timers: null,
+      timeout: 0,
       pickerOptions: {
         disabledDate (time) {
           return time.getTime() < Date.now() - 8.64e7;
@@ -231,11 +231,12 @@ export default {
   },
   methods: {
     htKeyup (e) {
-      this.spht = e.replace(/[^\a-\z\A-\Z0-9\u4e00-\u9fe5_]/g, '');
+      // this.spht = e.replace(/[^\a-\z\A-\Z0-9\u4e00-\u9fe5_]/g, '');
     },
-    hyKeyup (e) {
-      this.sphy = e.replace(/[^\a-\z\A-\Z0-9\u4e00-\u9fe5_]/g, '');
-    },
+    // 禁止输入空格和特殊字符串
+    // hyKeyup (e) {
+    //   this.sphy = e.replace(/[^\a-\z\A-\Z0-9\u4e00-\u9fe5_]/g, '');
+    // },
     // 评论内容修改
     plnrChange (e) {
       const arr = e.split('|');
@@ -283,14 +284,22 @@ export default {
         this.$refs.forwardModal.open(this.tableData);
       }
     },
+    debounce () {
+      if (this.timeout === 0) {
+        this.onSubmit();
+      } else {
+        this.$message.warning(`请勿频繁操作，请${this.timeout}s后重试`);
+      }
+    },
     onSubmit () {
       this.$refs.ruleForm.validate((valid) => {
         if (valid) {
           if (this.ruleForm.time) {
-            const d = new Date(this.ruleForm.time);
-            const resDate = d.getFullYear() + '-' + this.p((d.getMonth() + 1)) + '-' + this.p(d.getDate())
-            const resTime = this.p(d.getHours()) + ':' + this.p(d.getMinutes()) + ':' + this.p(d.getSeconds())
-            this.ruleForm.task_time = resDate + ' ' + resTime;
+            // const d = new Date(this.ruleForm.time);
+            // const resDate = d.getFullYear() + '-' + this.p((d.getMonth() + 1)) + '-' + this.p(d.getDate())
+            // const resTime = this.p(d.getHours()) + ':' + this.p(d.getMinutes()) + ':' + this.p(d.getSeconds())
+            // this.ruleForm.task_time = resDate + ' ' + resTime;
+            this.ruleForm.task_time = this.ruleForm.time;
             if (this.$route.query.name.indexOf('关注') === -1) {
               this.submit(this.ruleForm.task_time);
             } else {
@@ -354,6 +363,14 @@ export default {
               message: '执行成功！',
               type: 'success'
             });
+            this.timeout = 3;
+            var int = window.setInterval(() => {
+              if (this.timeout > 0) {
+                this.timeout--;
+              } else {
+                window.clearInterval(int);
+              }
+            }, 1000);
           } else {
             this.$message({
               message: res.data,
@@ -489,7 +506,7 @@ export default {
       };
       // 拼接content
       if (this.$route.query.name === '上传视频') {
-        this.ruleForm.content = this.ruleForm.spwb + ',,,,,' + this.ruleForm.spht + ',,,,,' + this.ruleForm.sphy;
+        this.ruleForm.content = this.ruleForm.spwb;
       }
       // 批量修改的接口
       this.selectTableRow.forEach(t => {
@@ -526,6 +543,14 @@ export default {
                 message: '执行成功！',
                 type: 'success'
               });
+              _this.timeout = 3;
+              var int = window.setInterval(() => {
+                if (_this.timeout > 0) {
+                  _this.timeout--;
+                } else {
+                  window.clearInterval(int);
+                }
+              }, 1000);
             } else {
               _this.$message({
                 message: request.response,
@@ -648,9 +673,9 @@ export default {
       color: #fff;
     }
   }
-  /deep/ .el-upload-list {
-    margin-left: -193px;
-  }
+  // /deep/ .el-upload-list {
+  //   margin-left: -193px;
+  // }
   .djsc {
     width: 400px;
     border: 1px solid #ccc;

@@ -210,11 +210,18 @@ export default {
       params.bulk = 1;
       wdsbServer.suspendDev(params).then(res => {
         if (res.status === 200) {
-          this.$message({
-            message: '工作状态修改成功！',
-            type: 'success'
-          });
-          this.getList(this.val);
+          if (res.data === '') {
+            this.$message({
+              message: '工作状态修改成功！',
+              type: 'success'
+            });
+            this.getList(this.val);
+          } else {
+            this.$message({
+              message: res.data.error,
+              type: 'warning'
+            });
+          }
         } else if (res.status === 201) {
           this.$message.warning(res.data);
         }
@@ -425,7 +432,7 @@ export default {
       }
       this.timers = setTimeout(() => {
         this.getList(this.val);
-      }, 15000);
+      }, 8000);
     }
   }
 }

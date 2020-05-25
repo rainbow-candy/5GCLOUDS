@@ -25,6 +25,7 @@
       width="42"
       type="selection"
       :reserve-selection="true"
+      :resizable="false"
     ></el-table-column>
     <el-table-column
       v-if="order"
@@ -32,6 +33,7 @@
       label="序号"
       width="60"
       type="index"
+      :resizable="false"
     ></el-table-column>
     <template v-for="item in columns">
       <el-table-column
@@ -44,6 +46,7 @@
         :sortable="item.sortable"
         show-overflow-tooltip
         align="center"
+        :resizable="false"
       >
         <template slot-scope="{ row }">
           <template v-if="item.clickEnable">
@@ -85,6 +88,7 @@
         :render-header="(h, obj) => renderHeader(h, obj, item)"
         show-overflow-tooltip
         align="center"
+        :resizable="false"
       >
       <template slot-scope="{ row }">
           <template v-if="item.backColor">

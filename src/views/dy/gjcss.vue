@@ -17,12 +17,12 @@
       </div>
       <!-- 关键词摘取 -->
       <div v-show="isActive" class="gjcForm">
-        <el-form label-position="left" label-width="100px" :model="form">
-          <div class="required">*</div><el-form-item label="关键词：">
+        <el-form label-position="left" label-width="100px" :model="form" :rules="rules" ref="gjcForm">
+          <el-form-item label="关键词：" prop="name">
             <el-input v-model="form.name"></el-input>
           </el-form-item>
-          <div class="required">*</div><el-form-item label="选择设备：">
-            <div style="height: 560px">
+          <el-form-item label="选择设备：" prop="id_list">
+            <!-- <div style="height: 560px">
               <base-table ref="sbTable" :columns="sbColumns" :data="tableData" selection height="530" @selection-change="selectionRow"
               ></base-table>
               <el-pagination
@@ -32,7 +32,15 @@
                 :total="total"
                 :current-page="current"
               ></el-pagination>
-            </div>
+            </div> -->
+            <el-select v-model="form.id_list" placeholder="请选择设备" style="width: 100%">
+              <el-option
+                v-for="item in tableData"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+              </el-option>
+            </el-select>
           </el-form-item>
         </el-form>
         <div class="submitZx">
@@ -107,6 +115,7 @@ export default {
       form: {
         name: '',
         region: '',
+        id_list: '',
         type: ''
       },
       myHeaders: { authorization: window.sessionStorage.getItem('token') },
@@ -163,7 +172,12 @@ export default {
         }
       ],
       tableData: [],
-      xsTableData: []
+      xsTableData: [],
+      // 表单必填校验
+      rules: {
+        name: { required: true, message: '必填', trigger: 'blur' },
+        id_list: { required: true, message: '必填', trigger: 'blur' }
+      }
     }
   },
   methods: {
@@ -172,39 +186,35 @@ export default {
     },
     // 关键词搜索执行
     onSubmit () {
-      if (this.form.name === '') {
-        this.$message.warning('请输入关键词！');
-      } else if (this.checkList.length === 0) {
-        this.$message.warning('请勾选设备！');
-      } else if (this.checkList.length > 1) {
-        this.$message.warning('只能勾选一台设备！');
-      } else {
-        const params = {
-          id_list: this.checkList[0].id,
-          key_w: this.form.name,
-          key_index: 1
-        }
-        const _this = this;
-        wdsbServer.kwordSearch(params).then(res => {
-          if (res.status === 200) {
-            this.$message({
-              message: res.data.msg,
-              type: 'success'
-            });
-            this.uploadIng = true;
-          } else if (res.status === 201) {
-            this.$message({
-              message: res.data.msg,
-              type: 'warning'
-            });
+      this.$refs.gjcForm.validate((valid) => {
+        if (valid) {
+          const params = {
+            id_list: this.form.id_list,
+            key_w: this.form.name,
+            key_index: 1
           }
-        }, function () {
-          _this.$message({
-            type: 'error',
-            message: '服务异常！'
-          });
-        })
-      }
+          const _this = this;
+          wdsbServer.kwordSearch(params).then(res => {
+            if (res.status === 200) {
+              this.$message({
+                message: res.data,
+                type: 'success'
+              });
+              this.uploadIng = true;
+            } else if (res.status === 201) {
+              this.$message({
+                message: res.data.msg,
+                type: 'warning'
+              });
+            }
+          }, function () {
+            _this.$message({
+              type: 'error',
+              message: '服务异常！'
+            });
+          })
+        }
+      });
     },
     // 关键词搜索下载文件
     exportExcel () {
@@ -336,7 +346,7 @@ export default {
     },
     getList (page) {
       const _this = this;
-      wdsbServer.myDev({ mydev: 1, page: page }).then(res => {
+      wdsbServer.myDev({ mydev_online: 1, mydev: 1, page: page, page_size: 100 }).then(res => {
         if (res.status === 200) {
           if (res.data.results.length > 0) {
             this.total = res.data.count;
@@ -431,7 +441,8 @@ export default {
     }
   }
   .gjcForm {
-    width: 550px;
+    width: 500px;
+    margin-top: 50px;
     /deep/ .el-form-item__label {
       color: black;
       font-weight: 600;
