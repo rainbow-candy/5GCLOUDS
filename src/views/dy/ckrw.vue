@@ -109,7 +109,10 @@ export default {
   },
   methods: {
     toHome () {
-      this.$router.go(-1)
+      this.$router.push({
+        path: '/dymain',
+        query: { type: 'dy' }
+      });
     },
     cancel () {
     },
@@ -379,6 +382,9 @@ export default {
       value: '垂直养号',
       text: '垂直养号'
     }, {
+      value: '上热门',
+      text: '上热门'
+    }, {
       value: '推荐点赞',
       text: '推荐点赞'
     }, {
@@ -400,8 +406,14 @@ export default {
       value: '直播助力',
       text: '直播助力'
     }, {
-      value: '上传视频',
-      text: '上传视频'
+      value: '关键词搜索',
+      text: '关键词搜索'
+    }, {
+      value: '取消关注',
+      text: '取消关注'
+    }, {
+      value: '同步',
+      text: '同步'
     }];
     this.tableColumns[4].filterData = [{
       value: '',

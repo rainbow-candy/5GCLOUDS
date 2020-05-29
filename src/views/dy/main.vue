@@ -84,7 +84,9 @@ export default {
   },
   methods: {
     toHome () {
-      this.$router.go(-1)
+      this.$router.push({
+        path: '/home'
+      })
     },
     // 进入我的设备页面
     wdsb () {

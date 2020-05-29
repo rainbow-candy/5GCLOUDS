@@ -134,7 +134,8 @@ export default {
         }
       } else {
         parms = {
-          info: 1,
+          // info: 1,
+          mydev_online: 1,
           page: page,
           app_type: this.$route.query.type,
           dy_s: dyh

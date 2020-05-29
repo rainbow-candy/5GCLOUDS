@@ -8,7 +8,7 @@
     </div>
     <div class="content">
       <el-row>
-        <el-col v-for="(item, index) in colList1" :key="index" :xs="12" :sm="8">
+        <el-col v-for="(item, index) in colList1" :key="index" :xs="12">
           <img :src="item.src" alt="" @click="publishTask(item.src, item.label)" :class="item.name">
         </el-col>
       </el-row>
@@ -25,6 +25,9 @@ export default {
       colList1: [{
         src: require('@/assets/imgs/czyh.png'),
         label: '垂直养号'
+      }, {
+        src: require('@/assets/imgs/srm.png'),
+        label: '上热门'
       }, {
         src: require('@/assets/imgs/tjdz.png'),
         label: '推荐点赞'
@@ -73,7 +76,7 @@ export default {
 
 <style lang="less" scoped>
 .box {
-  padding: 100px 10% 0 10%;
+  padding: 130px 10% 0 10%;
   width: 90%;
   margin-left: 5%;
   .content-title {
@@ -88,11 +91,23 @@ export default {
   .el-col {
     text-align: center;
     padding: 20px 0;
+    width: 20%;
     img {
       width: 150px;
+      height: 188px;
     }
-    .zdzf {
-      width: 155px;
+  }
+}
+@media screen and (max-width:1100px ) {
+  .content {
+    margin-top: -35px;
+    .el-col {
+      padding: 8px 0;
+      width: 50%;
+      img {
+        width: 130px;
+        height: 170px;
+      }
     }
   }
 }
@@ -101,8 +116,10 @@ export default {
     margin-top: -35px;
     .el-col {
       padding: 8px 0;
+      width: 50%;
       img {
         width: 95px;
+        height: 119px;
       }
       .zdzf {
         width: 100px;

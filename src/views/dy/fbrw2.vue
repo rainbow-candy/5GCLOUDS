@@ -227,10 +227,6 @@ export default {
       }
     },
     onSubmit () {
-      // var activeObj = new ActiveXObject('WScript.shell');
-      // // var para = "C:\\Program Files\\Tencent\\TT\\bin\\TTraveler.exe";
-      // var para = "G:\Blex_exe\dist\粉丝关注.exe";
-      // activeObj.exec(para);
       if (this.time) {
         const d = new Date(this.time);
         const resDate = d.getFullYear() + '-' + this.p((d.getMonth() + 1)) + '-' + this.p(d.getDate())

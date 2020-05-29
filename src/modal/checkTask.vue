@@ -12,6 +12,13 @@
         <a :href="form.to_file">点击下载文件查看评论内容</a>
       </el-form-item>
     </el-form>
+    <!-- 上热门 -->
+    <el-form label-width="120px" v-if="form.task_nick === '上热门'">
+      <div class="check1">抖音号：{{form.search_str}}</div>
+      <div class="check1">观看视频数量：{{form.to_num}}</div>
+      <div class="check1">单个视频观看次数：{{form.content}}</div>
+      <div class="check1">单个视频观看时间：{{form.check_time}}</div>
+    </el-form>
 
     <!-- 点赞 -->
     <el-form label-width="120px" v-if="form.task_nick === '推荐点赞' || form.task_nick === '同城点赞'">
@@ -71,7 +78,7 @@
       <div class="check1">关键词：{{form.search_str}}</div>
     </el-form>
 
-    <!-- 关键词搜索 -->
+    <!-- 取消关注 -->
     <el-form label-width="120px" v-if="form.task_nick === '取消关注'">
       <div class="check1">取关数量：{{form.to_num}}</div>
     </el-form>

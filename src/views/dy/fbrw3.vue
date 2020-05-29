@@ -7,6 +7,9 @@
       <div class="to-home" @click="toHome">
         <i class="el-icon-refresh-left"></i>返回上级
       </div>
+      <div class="to-home to-list" @click="toList">
+        <i class="el-icon-s-fold"></i>进入任务列表
+      </div>
       <img src="@/assets/imgs/dy-logo.png" alt class="logo"/>
     </div>
     <div class="search_str">
@@ -32,6 +35,9 @@
         </el-form-item>
         <el-form-item label="转发数量：" prop="to_num" v-if="this.$route.query.name.indexOf('转发评论') !== -1">
           <el-input-number v-model="ruleForm.to_num" controls-position="right" :min="1" label="请输入转发数量"></el-input-number>
+        </el-form-item>
+        <el-form-item label="点赞数量筛选：" v-if="this.$route.query.name === '指定转发评论'">
+          <el-input-number v-model="ruleForm.likes" controls-position="right" :min="0" label="请输入最少点赞数量"></el-input-number>
         </el-form-item>
         <div v-if="this.$route.query.name.indexOf('转发评论') !== -1 || this.$route.query.name.indexOf('点赞') !== -1 || this.$route.query.name === '垂直养号'">
           <div class="required" style="left: 63px;" v-if="this.$route.query.name.indexOf('转发评论') !== -1">*</div>
@@ -92,7 +98,7 @@
             </div>
           </el-form-item>
           <el-form-item label="观看时间："  prop="to_num">
-            <el-input-number v-model="ruleForm.to_num" controls-position="right" :min="5" :max="240" label="请输入观看时间"></el-input-number>
+            <el-input-number v-model="ruleForm.to_num" controls-position="right" placeholder="以分钟为单位" :min="5" :max="240"></el-input-number>
           </el-form-item>
         </div>
         <!-- 上传视频 -->
@@ -120,6 +126,21 @@
               :file-list="fileList">
               <div class="djsc">选择文件（文件最大50M）</div>
             </el-upload>
+          </el-form-item>
+        </div>
+        <!-- 上热门 -->
+        <div v-if="this.$route.query.name === '上热门'">
+          <el-form-item label="抖音号：" prop="search_str">
+            <el-input type="text" v-model="ruleForm.search_str" placeholder="请输入抖音号"></el-input>
+          </el-form-item>
+          <el-form-item label="观看视频数量："  prop="to_num">
+            <el-input-number v-model="ruleForm.to_num" controls-position="right" :min="0" label="请输入观看数量"></el-input-number>
+          </el-form-item>
+          <el-form-item label="单个视频观看次数："  prop="content">
+            <el-input-number v-model="ruleForm.content" controls-position="right" :min="0" label="请输入单个视频观看数量"></el-input-number>
+          </el-form-item>
+          <el-form-item label="单个视频观看时间："  prop="check_time">
+            <el-input-number v-model="ruleForm.check_time" controls-position="right" :min="0"  placeholder="大于单个视频的时长（单位为秒）"></el-input-number>
           </el-form-item>
         </div>
         <!-- 执行方式 -->
@@ -178,10 +199,12 @@ export default {
       ruleForm: {
         time: '',
         search_str: '',
-        to_num: '',
+        to_num: undefined,
         content: '',
         spwb: '',
-        at_me: ''
+        at_me: '',
+        check_time: undefined,
+        likes: ''
       },
       fileList: [],
       toFileList: [],
@@ -191,7 +214,8 @@ export default {
         spwb: { required: true, message: '必填', trigger: 'blur' },
         // toFileList: { required: true, message: '必填' },
         search_str: { required: true, message: '必填', trigger: 'blur' },
-        content: { required: true, message: '必填', trigger: 'blur' }
+        content: { required: true, message: '必填', trigger: 'blur' },
+        check_time: { required: true, message: '必填', trigger: 'blur' }
       },
       // 评论最大长度
       maxlength: '',
@@ -252,6 +276,12 @@ export default {
     toHome () {
       this.$router.go(-1)
     },
+    toList () {
+      this.$router.push({
+        path: '/checkTask',
+        query: { type: 'dy' }
+      });
+    },
     // 选择设备
     xzsb () {
       this.sbShow = !this.sbShow
@@ -300,13 +330,13 @@ export default {
             // const resTime = this.p(d.getHours()) + ':' + this.p(d.getMinutes()) + ':' + this.p(d.getSeconds())
             // this.ruleForm.task_time = resDate + ' ' + resTime;
             this.ruleForm.task_time = this.ruleForm.time;
-            if (this.$route.query.name.indexOf('关注') === -1) {
+            if (this.$route.query.name.indexOf('关注') === -1 && this.$route.query.name !== '上热门') {
               this.submit(this.ruleForm.task_time);
             } else {
               this.ljzx(this.ruleForm.task_time);
             }
           } else {
-            if (this.$route.query.name.indexOf('关注') === -1) {
+            if (this.$route.query.name.indexOf('关注') === -1 && this.$route.query.name !== '上热门') {
               this.submit();
             } else {
               this.ljzx();
@@ -327,7 +357,8 @@ export default {
         content: this.ruleForm.content,
         search_str: this.ruleForm.search_str,
         bulk: 1,
-        at_me: this.ruleForm.at_me
+        at_me: this.ruleForm.at_me,
+        check_time: this.ruleForm.check_time
       };
       // 立即执行不需要传task_time
       if (!this.isActive) {
@@ -345,6 +376,7 @@ export default {
       }
     },
     ljzx1 (params) {
+      console.log(params)
       if (this.selectTableRow.length > 1) {
         // 批量修改的接口
         this.selectTableRow.forEach(t => {
@@ -520,10 +552,9 @@ export default {
       formData.append('task_nick', this.$route.query.name);
       formData.append('app_type', this.$route.query.type);
       formData.append('search_str', this.ruleForm.search_str);
-      if (this.$route.query.name === '直播助力') {
-        formData.append('to_num', this.ruleForm.to_num);
-      } else if (this.$route.query.name.indexOf('转发评论') !== -1 || this.$route.query.name.indexOf('点赞') !== -1 || this.$route.query.name === '垂直养号') {
-        formData.append('to_num', this.ruleForm.to_num);
+      formData.append('to_num', this.ruleForm.to_num);
+      if (this.$route.query.name === '指定转发评论') {
+        formData.append('likes', this.ruleForm.likes);
       }
       formData.append('to_file', this.toFileList[0]);
       formData.append('bulk', 1);
@@ -698,7 +729,15 @@ export default {
   font-size: 15px;
 }
 
+.to-list {
+  top: 125px;
+  font-size: 1.4rem;
+}
+
 @media screen and (max-width:770px ) {
+  .to-list {
+    top: 88px;
+  }
   .box {
     padding: 40px 0 0 0;
   }

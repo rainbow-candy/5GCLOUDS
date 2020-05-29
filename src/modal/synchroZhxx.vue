@@ -42,7 +42,14 @@ export default {
           prop: 'group',
           label: '组别',
           filter: true,
-          filterData: []
+          filterData: [],
+          width: 180
+        },
+        {
+          prop: 'online',
+          label: '在线情况',
+          sortable: true,
+          backColorqk: true
         }
       ],
       tableData: [],
@@ -86,10 +93,12 @@ export default {
         if (res.status === 200) {
           this.dialogVisible = false;
           this.$message({
-            message: res.data,
+            message: res.data.msg,
             type: 'success'
           });
-          this.$parent.getList();
+          setTimeout(() => {
+            this.$parent.getList();
+          }, 3000);
         } else if (res.status === 201) {
           this.dialogVisible = false;
           this.$message({
@@ -97,7 +106,10 @@ export default {
             type: 'warning'
           });
         }
-      })
+      }).catch(error => {
+        console.log(error.request);
+        this.$message.error(error.request.response);
+      });
     },
     // 取消
     cancel () {
@@ -114,22 +126,22 @@ export default {
       }, 500);
     },
     getList (page) {
-      const _this = this;
-      wdsbServer.myDev({ mydev: 1, page: page }).then(res => {
+      wdsbServer.myDev({ mydev_online: 1, page: page, page_size: this.page_size }).then(res => {
         if (res.status === 200) {
-          if (res.data.results.length > 0) {
-            this.total = res.data.count;
-            this.tableData = res.data.results;
-            this.getFilterData(this.tableData);
-            this.reSelect();
-          }
+          res.data.results.forEach((t) => {
+            if (t.online === 1) {
+              t.online = '在线';
+            } else {
+              t.online = '离线';
+            }
+          });
+          this.tableData = res.data.results;
+          this.total = res.data.count;
+          this.getFilterData(this.tableData);
         }
-      }, function () {
-        _this.$message({
-          type: 'error',
-          message: '服务异常！'
-        });
-      })
+      }).catch(error => {
+        this.$message.error(error.request.response);
+      });
     },
     // 获取筛选数组
     getFilterData (data) {
@@ -169,9 +181,6 @@ export default {
     /deep/ .el-dialog__close {
         color: #fff;
     }
-}
-/deep/ .el-select {
-  width: 100%;
 }
 /deep/ .el-button--primary {
     background-color: #e68048;
