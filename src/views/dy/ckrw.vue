@@ -109,10 +109,17 @@ export default {
   },
   methods: {
     toHome () {
-      this.$router.push({
-        path: '/dymain',
-        query: { type: 'dy' }
-      });
+      if (this.$route.query.type === 'dy') {
+        this.$router.push({
+          path: '/dymain',
+          query: { type: 'dy' }
+        });
+      } else {
+        this.$router.push({
+          path: '/ksmain',
+          query: { type: 'ks' }
+        });
+      }
     },
     cancel () {
     },
@@ -228,10 +235,13 @@ export default {
         } else if (res.status === 201) {
           this.$message.warning(res.data);
         }
-      }).catch((error) => {
-        this.$message.error('服务异常，退出失败！')
-        console.log(error.response);
-      })
+      }).catch(error => {
+        if (error.request.status === 500) {
+          this.$message.error('服务异常！')
+        } else {
+          this.$message.error(error.request.response);
+        }
+      });
     },
     // 视频删除
     pauseVideo (ids) {
@@ -246,7 +256,13 @@ export default {
           this.selectTableRow = [];
           this.$refs.baseTable.clearSelection();
         }
-      })
+      }).catch(error => {
+        if (error.request.status === 500) {
+          this.$message.error('服务异常！')
+        } else {
+          this.$message.error(error.request.response);
+        }
+      });
     },
     // 切换条数
     handleCurrentChange (val) {
@@ -313,7 +329,13 @@ export default {
             this.tableData = []
           }
         }
-      })
+      }).catch(error => {
+        if (error.request.status === 500) {
+          this.$message.error('服务异常！')
+        } else {
+          this.$message.error(error.request.response);
+        }
+      });
     },
     getFilter (Arr, key) {
       var hash = {};
@@ -350,7 +372,13 @@ export default {
             this.tableColumns[0].filterData = [];
           }
         }
-      })
+      }).catch(error => {
+        if (error.request.status === 500) {
+          this.$message.error('服务异常！')
+        } else {
+          this.$message.error(error.request.response);
+        }
+      });
     },
     getFZList () {
       wdsbServer.myDev({ task: 1, app_type: this.$route.query.type, is_group: 1, page_size: 100 }).then(res => {
@@ -367,7 +395,13 @@ export default {
             this.tableColumns[1].filterData = [];
           }
         }
-      })
+      }).catch(error => {
+        if (error.request.status === 500) {
+          this.$message.error('服务异常！')
+        } else {
+          this.$message.error(error.request.response);
+        }
+      });
     }
   },
   // 实例创建完成

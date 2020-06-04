@@ -157,6 +157,12 @@ export default {
             this.tableData = [];
           }
         }
+      }).catch(error => {
+        if (error.request.status === 500) {
+          this.$message.error('服务异常！')
+        } else {
+          this.$message.error(error.request.response);
+        }
       });
     },
     getFZList () {
@@ -169,12 +175,18 @@ export default {
                 Object.assign({}, { value: item.group, text: item.group })
               )
             });
-            this.tableColumns[1].filterData.unshift({ value: '', text: '全部' });
+            this.tableColumns[2].filterData.unshift({ value: '', text: '全部' });
           } else {
             this.tableColumns[2].filterData = [];
           }
         }
-      })
+      }).catch(error => {
+        if (error.request.status === 500) {
+          this.$message.error('服务异常！')
+        } else {
+          this.$message.error(error.request.response);
+        }
+      });
     }
   },
   created () {

@@ -55,19 +55,17 @@ export default {
         if (valid) {
           wdsbServer.feedback(this.form).then(res => {
             if (res.status === 200) {
-              // this.$alert('感谢您的帮助与支持！', '反馈成功', {
-              //   confirmButtonText: '确定'
-              // });
               this.$alert('<h3>感谢您的帮助与支持!</h3>', '反馈成功', {
                 dangerouslyUseHTMLString: true,
                 center: true
               });
             }
-          })
-        } else {
-          this.$message({
-            message: '请完善表单！',
-            type: 'warning'
+          }).catch(error => {
+            if (error.request.status === 500) {
+              this.$message.error('服务异常！')
+            } else {
+              this.$message.error(error.request.response);
+            }
           });
         }
       });

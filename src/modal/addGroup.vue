@@ -79,8 +79,7 @@ export default {
           prop: 'group',
           label: '组别',
           filter: true,
-          filterData: [],
-          width: 200
+          filterData: []
         }
       ],
       tableData: [],
@@ -216,9 +215,6 @@ export default {
     /deep/ .el-dialog__close {
         color: #fff;
     }
-}
-/deep/ .el-select {
-  width: 100%;
 }
 /deep/ .el-button--primary {
     background-color: #e68048;

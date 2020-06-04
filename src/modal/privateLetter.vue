@@ -1,6 +1,20 @@
 <template>
   <el-dialog title="私信内容" :visible.sync="dialogVisible" :width="dialogWidth">
-    <el-input type="textarea" :rows="3" v-model="name"  placeholder="请输入私信内容"></el-input>
+    <el-form ref="form" :model="form" label-width="100px" :rules="rules">
+      <el-form-item label="选择设备：" prop="id_list">
+        <el-select v-model="form.id_list" multiple collapse-tags placeholder="请选择设备">
+          <el-option
+            v-for="item in tableData"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="私信内容：" prop="name">
+        <el-input type="textarea" :rows="3" v-model="form.name"  placeholder="请输入私信内容"></el-input>
+      </el-form-item>
+    </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="dialogVisible = false">取 消</el-button>
       <el-button type="primary" @click="submit">确 定</el-button>
@@ -16,8 +30,16 @@ export default {
   data () {
     return {
       dialogVisible: false,
-      name: '',
-      checkList: [],
+      form: {
+        name: '',
+        id_list: '',
+        gz_sx: 1
+      },
+      rules: {
+        id_list: { required: true, message: '请选择设备', trigger: 'blur' },
+        name: { required: true, message: '请输入私信内容', trigger: 'blur' }
+      },
+      tableData: [],
       dialogWidth: ''
     }
   },
@@ -25,45 +47,31 @@ export default {
     open (data) {
       this.dialogVisible = true;
       this.name = '';
-      this.checkList = data;
+      this.tableData = data;
     },
     submit () {
-      if (this.name === '') {
-        this.$message.warning('请输入私信内容！');
-      } else {
-        const params = {
-          gz_sx: this.name,
-          id_list: ''
-        }
-        this.checkList.forEach(t => {
-          params.id_list += t.id + ','
-        });
-        params.id_list = params.id_list.substr(0, params.id_list.length - 1);
-        const _this = this;
-        wdsbServer.kwordSearch(params).then(res => {
-          if (res.status === 200) {
-            this.$message({
-              message: res.data.msg,
-              type: 'success'
-            });
-            this.uploadIng = true;
-          } else if (res.status === 201) {
-            this.$message({
-              message: res.data.msg,
-              type: 'warning'
-            });
-          }
-        }, function () {
-          _this.$message({
-            type: 'error',
-            message: '服务异常！'
+      this.form.id_list = this.form.id_list.join(',')
+      wdsbServer.kwordSearch(this.form).then(res => {
+        if (res.status === 200) {
+          this.$message({
+            message: '执行成功！',
+            type: 'success'
           });
-        })
-      }
+          this.uploadIng = true;
+          this.dialogVisible = false;
+        } else if (res.status === 201) {
+          this.$message({
+            message: res.data.msg,
+            type: 'warning'
+          });
+        }
+      }).catch(error => {
+        this.$message.error(error.request.response);
+      })
     }
   },
   mounted () {
-    this.dialogWidth = window.sessionStorage.getItem('fullWidth') > 770 ? '400px' : '100%';
+    this.dialogWidth = window.sessionStorage.getItem('fullWidth') > 770 ? '500px' : '100%';
   }
 }
 </script>
@@ -81,5 +89,8 @@ export default {
 /deep/ .el-button--primary {
     background-color: #e68048;
     border-color: #e68048;
+}
+/deep/ .el-select {
+  width: 100%;
 }
 </style>

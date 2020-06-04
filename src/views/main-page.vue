@@ -10,7 +10,7 @@
     </div>
     <div class="content">
       <div style="text-align: center;">
-        <el-popover
+        <!-- <el-popover
           placement="top"
           title="提示"
           width="270"
@@ -18,8 +18,8 @@
           content="升级版即将上线，敬请期待......"
           v-model="visible">
           <img src="@/assets/imgs/ks-btn.png" alt class="ks" @click="visible = !visible" slot="reference"/>
-        </el-popover>
-        <!-- <img src="@/assets/imgs/ks-btn.png" alt class="ks" @click="toKS" /> -->
+        </el-popover> -->
+        <img src="@/assets/imgs/ks-btn.png" alt class="ks" @click="toKS" />
         <img src="@/assets/imgs/dy-btn-1.png" alt class="dy" @click="toDY" />
       </div>
     </div>

@@ -8,12 +8,7 @@
     </div>
     <div class="content">
       <el-row>
-        <el-col :span="6" v-for="(item, index) in colList1" :key="index">
-          <img :src="item.src" alt="" @click="publishTask(item.src, item.label)">
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-col :span="6" v-for="(item, index) in colList2" :key="index">
+        <el-col :xs="12" :sm="6" v-for="(item, index) in colList1" :key="index">
           <img :src="item.src" alt="" @click="publishTask(item.src, item.label)">
         </el-col>
       </el-row>
@@ -27,27 +22,29 @@ export default {
   data () {
     return {
       colList1: [{
-        src: require('@/assets/imgs/ks/gzwh.png'),
-        label: '关注网红'
+        src: require('@/assets/imgs/ks/czyh.png'),
+        label: '垂直养号'
       }, {
-        src: require('@/assets/imgs/ks/ssdl.png'),
-        label: '搜索大类'
-      }, {
-        src: require('@/assets/imgs/ks/ssksh.png'),
-        label: '搜索快手号'
-      }, {
-        src: require('@/assets/imgs/ks/zbzl.png'),
-        label: '直播助力'
-      }],
-      colList2: [{
-        src: require('@/assets/imgs/ks/fx.png'),
-        label: '发现'
-      }, {
-        src: require('@/assets/imgs/ks/scsp.png'),
-        label: '上传视频'
+        src: require('@/assets/imgs/ks/fxdz.png'),
+        label: '发现点赞'
       }, {
         src: require('@/assets/imgs/ks/tcdz.png'),
         label: '同城点赞'
+      }, {
+        src: require('@/assets/imgs/ks/ssgz.png'),
+        label: '搜索关注'
+      }, {
+        src: require('@/assets/imgs/ks/zfpl.png'),
+        label: '转发评论'
+      }, {
+        src: require('@/assets/imgs/ks/zbzl.png'),
+        label: '直播助力'
+      }, {
+        src: require('@/assets/imgs/ks/zbjcj.png'),
+        label: '直播间采集'
+      }, {
+        src: require('@/assets/imgs/ks/scsp.png'),
+        label: '上传视频'
       }]
     }
   },
@@ -84,7 +81,21 @@ export default {
     text-align: center;
     padding: 30px 0;
     img {
-      width: 170px;
+      width: 160px;
+      cursor: pointer;
+    }
+  }
+}
+@media screen and (max-width:770px ) {
+  .content {
+    margin-top: 10px;
+    .el-col {
+      text-align: center;
+      padding: 0;
+      img {
+        width: 92px;
+        height: 121px;
+      }
     }
   }
 }

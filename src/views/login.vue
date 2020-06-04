@@ -26,6 +26,7 @@ import { crypto } from '@/utils/crypto.js';
 import loginServer from '@/api/login-server.js';
 import { setUserLocal } from '@/api/user-server.js';
 import { App } from '@/utils/auth';
+// jwt的token解密
 import jwtDecode from 'jwt-decode'
 
 export default {
@@ -89,8 +90,11 @@ export default {
                 });
               }
             }).catch(error => {
-              console.log(error.request);
-              this.$message.error(error.request.response);
+              if (error.request.status === 500) {
+                this.$message.error('服务异常！')
+              } else {
+                this.$message.error(error.request.response);
+              }
             });
         }
       });

@@ -49,6 +49,12 @@ const wdsbServer = {
   forward (params) {
     return fetch('api/task/kword/', 'get', params)
   }
+
+  // 直播间采集
+  // 获取数据
+  // forward (params) {
+  //   return fetch('api/task/kword/', 'get', params)
+  // },
 };
 
 export default wdsbServer;

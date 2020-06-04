@@ -49,6 +49,7 @@
       <el-form-item label="转发数量：">
         <p>{{form.to_num}}</p>
       </el-form-item>
+      <div class="check1" v-if="form.task_nick === '转发评论'">点赞数量筛选：{{form.likes ? form.likes : zero}}</div>
       <div class="check1" v-if="!form.to_file">@好友：{{form.at_me ? form.at_me : zero}}</div>
       <el-form-item label="评论内容：" v-if="form.to_file">
         <a :href="form.to_file">点击下载文件查看评论内容</a>
@@ -63,6 +64,11 @@
       <el-form-item label="弹幕文案：" v-if="form.to_file">
         <a :href="form.to_file">点击下载文件查看弹幕内容</a>
       </el-form-item>
+    </el-form>
+
+    <!-- 直播间采集 -->
+    <el-form label-width="120px" v-if="form.task_nick === '直播间采集'">
+      <div class="check1">抖音号：{{form.search_str}}</div>
     </el-form>
 
     <!-- 上传视频 -->

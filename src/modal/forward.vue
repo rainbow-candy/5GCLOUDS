@@ -1,7 +1,7 @@
 <template>
   <el-dialog title="选择用户" :visible.sync="dialogVisible" width="800px" :before-close="cancel">
     <div style="display: flex;">
-      <el-table :data="sbData" class="sbNameTable" border stripe @row-click="selectSB" :row-class-name="tableRowClassName" style="max-width: 111px;" max-height="380px">
+      <el-table :data="sbData" class="sbNameTable" border stripe @row-click="selectSB" :row-class-name="tableRowClassName" style="max-width: 150px;" max-height="380px">
         <el-table-column
           label="设备"
           width="110"
@@ -69,9 +69,25 @@ export default {
           Object.assign({}, item, { 'iconName': 'el-icon-caret-bottom' })
         )
       })
+      if (this.sbData.length > 0) {
+        this.getList(this.sbData[0].id);
+        this.sbData[0].iconName = 'el-icon-caret-right'
+      }
+      // wdsbServer.myDev({ mydev_online: 1, page: 1, page_size: 100 }).then(res => {
+      //   if (res.status === 200) {
+      //     res.data.results.map(item => {
+      //       this.sbData.push(
+      //         Object.assign({}, item, { 'iconName': 'el-icon-caret-bottom' })
+      //       )
+      //     })
+      //     if (this.sbData.length > 0) {
+      //       this.getList(this.sbData[0].id);
+      //       this.sbData[0].iconName = 'el-icon-caret-right'
+      //     }
+      //   }
+      // })
       this.current = 1;
       this.dialogVisible = true;
-      this.getList(1);
     },
     // 表格复选框选中
     selectionRow (data) {
@@ -91,9 +107,11 @@ export default {
         this.getList(row.id)
       } else if (row.iconName === 'el-icon-caret-right') {
         row.iconName = 'el-icon-caret-bottom';
+        this.tableData = [];
       }
     },
     submit () {
+      console.log(this.checkList)
       if (this.checkList.length === 0) {
         this.$message({
           type: 'warning',
@@ -106,7 +124,7 @@ export default {
         });
         content = content.substr(0, content.length - 1);
         this.dialogVisible = false;
-        this.$parent.ruleForm.content = content;
+        this.$parent.ruleForm.at_me = content;
       }
     },
     // 取消

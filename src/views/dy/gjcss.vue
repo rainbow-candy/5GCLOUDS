@@ -17,22 +17,8 @@
       </div>
       <!-- 关键词摘取 -->
       <div v-show="isActive" class="gjcForm">
-        <el-form label-position="left" label-width="100px" :model="form" :rules="rules" ref="gjcForm">
-          <el-form-item label="关键词：" prop="name">
-            <el-input v-model="form.name"></el-input>
-          </el-form-item>
+        <el-form label-position="left" label-width="110px" :model="form" :rules="rules" ref="gjcForm">
           <el-form-item label="选择设备：" prop="id_list">
-            <!-- <div style="height: 560px">
-              <base-table ref="sbTable" :columns="sbColumns" :data="tableData" selection height="530" @selection-change="selectionRow"
-              ></base-table>
-              <el-pagination
-                class="sp-pagenation"
-                @current-change="handleCurrentChange"
-                layout="prev, pager, next, total, jumper"
-                :total="total"
-                :current-page="current"
-              ></el-pagination>
-            </div> -->
             <el-select v-model="form.id_list" placeholder="请选择设备" style="width: 100%">
               <el-option
                 v-for="item in tableData"
@@ -42,9 +28,18 @@
               </el-option>
             </el-select>
           </el-form-item>
+          <el-form-item label="关键词：" prop="name">
+            <el-input v-model="form.name"></el-input>
+          </el-form-item>
+          <el-form-item label="获赞数大于：" prop="to_num">
+            <el-input-number v-model="form.to_num" controls-position="right" :min="1" label="请输入获赞数" style="width: 100%;"></el-input-number>
+          </el-form-item>
+          <el-form-item label="采集数量：" prop="likes">
+            <el-input-number v-model="form.likes" controls-position="right" :min="1" label="请输入采集数量" style="width: 100%"></el-input-number>
+          </el-form-item>
         </el-form>
         <div class="submitZx">
-          <el-button type="primary" @click="onSubmit" :disabled="uploadIng">执行</el-button>
+          <el-button type="primary" @click="onSubmit">执行</el-button>
         </div>
       </div>
       <!-- 数据分析 -->
@@ -71,6 +66,12 @@
             <el-button class="sjfx" type="warning" @click="letter">关注+私信</el-button>
           </el-col>
           <el-col :xs="5" :sm="4" :md="3" :lg="2">
+            <el-button class="sjfx" type="warning" @click="importKeyword(current1);"><i class="el-icon-refresh"></i>刷新</el-button>
+          </el-col>
+          <el-col :xs="5" :sm="4" :md="3" :lg="2">
+            <el-button class="sjfx" type="warning" @click="deleteMore"><i class="el-icon-delete"></i>批量删除</el-button>
+          </el-col>
+          <el-col :xs="5" :sm="4" :md="3" :lg="2">
             <el-input class="gjcSearch"
             placeholder="关键词搜索"
             v-model="input4" @keyup.enter.native="querygjc(1)">
@@ -78,7 +79,19 @@
           </el-input>
           </el-col>
         </el-row>
-        <base-table ref="sbTable" :columns="tableColumns" :data="xsTableData" selection  height="530" @selection-change="selectionRow1" v-if="this.$route.query.type === 'dy'">
+        <base-table ref="sbTable" :columns="tableColumns" :data="xsTableData" selection height="530" @selection-change="selectionRow1" v-if="this.$route.query.type === 'dy'">
+          <el-table-column label="操作" width="150" align="center">
+            <template slot-scope="scope">
+              <el-button type="text" icon="el-icon-delete" @click="deleteRow(scope.row)">删除</el-button>
+            </template>
+          </el-table-column>
+        </base-table>
+        <base-table ref="sbTable" :columns="tableColumns2" :data="tableData" selection  height="530" @selection-change="selectionRow1" v-if="this.$route.query.type !== 'dy'">
+          <el-table-column label="操作" width="150" align="center">
+            <template slot-scope="scope">
+              <el-button type="text" icon="el-icon-delete" @click="deleteRow(scope.row)">删除</el-button>
+            </template>
+          </el-table-column>
         </base-table>
         <el-pagination
           class="fx-pagenation"
@@ -87,8 +100,6 @@
           :total="total1"
           :current-page="current1"
         ></el-pagination>
-        <base-table :columns="tableColumns2" :data="tableData" selection  height="530" @selection-change="selectionRow1" v-if="this.$route.query.type !== 'dy'">
-        </base-table>
         <p>温馨提示：导入的数据会储存48小时后自动清除</p>
       </div>
     </div>
@@ -116,7 +127,9 @@ export default {
         name: '',
         region: '',
         id_list: '',
-        type: ''
+        type: '',
+        to_num: 1,
+        likes: 1
       },
       myHeaders: { authorization: window.sessionStorage.getItem('token') },
       btnSize: window.sessionStorage.getItem('fullWidth') > 770 ? '' : 'mini',
@@ -139,14 +152,12 @@ export default {
       tableColumns: [
         {
           prop: 'dy_num',
-          label: '抖音号',
+          label: '用户抖音号',
           width: 200
         },
         {
-          prop: 'device',
-          label: '设备',
-          filter: true,
-          filterData: [],
+          prop: 'taskKey',
+          label: '关键词',
           width: 200
         },
         {
@@ -176,7 +187,9 @@ export default {
       // 表单必填校验
       rules: {
         name: { required: true, message: '必填', trigger: 'blur' },
-        id_list: { required: true, message: '必填', trigger: 'blur' }
+        id_list: { required: true, message: '必填', trigger: 'blur' },
+        to_num: { required: true, message: '必填', trigger: 'blur' },
+        likes: { required: true, message: '必填', trigger: 'blur' }
       }
     }
   },
@@ -191,9 +204,10 @@ export default {
           const params = {
             id_list: this.form.id_list,
             key_w: this.form.name,
-            key_index: 1
+            key_index: 1,
+            to_num: this.form.to_num,
+            likes: this.form.likes
           }
-          const _this = this;
           wdsbServer.kwordSearch(params).then(res => {
             if (res.status === 200) {
               this.$message({
@@ -207,12 +221,13 @@ export default {
                 type: 'warning'
               });
             }
-          }, function () {
-            _this.$message({
-              type: 'error',
-              message: '服务异常！'
-            });
-          })
+          }).catch(error => {
+            if (error.request.status === 500) {
+              this.$message.error('服务异常！')
+            } else {
+              this.$message.error(error.request.response);
+            }
+          });
         }
       });
     },
@@ -225,7 +240,6 @@ export default {
       }
     },
     exportExcel1 () {
-      const _this = this;
       wdsbServer.kwordSearch({ out_xls: 1 }).then(res => {
         if (res.status === 200) {
           this.$message({
@@ -248,12 +262,13 @@ export default {
             type: 'error'
           });
         }
-      }, function () {
-        _this.$message({
-          type: 'error',
-          message: '服务异常！'
-        });
-      })
+      }).catch(error => {
+        if (error.request.status === 500) {
+          this.$message.error('服务异常！')
+        } else {
+          this.$message.error(error.request.response);
+        }
+      });
     },
     // 导入数据
     onSuccess (response) {
@@ -262,19 +277,19 @@ export default {
       this.importKeyword(1);
     },
     importKeyword (page) {
-      const _this = this;
       wdsbServer.getKword({ page: page }).then(res => {
         if (res.status === 200) {
           this.xsTableData = res.data.results;
           this.total1 = res.data.count;
           this.getFilterData(this.xsTableData, 'tableColumns', 'device');
         }
-      }, function () {
-        _this.$message({
-          type: 'error',
-          message: '服务异常！'
-        });
-      })
+      }).catch(error => {
+        if (error.request.status === 500) {
+          this.$message.error('服务异常！')
+        } else {
+          this.$message.error(error.request.response);
+        }
+      });
     },
     tabChange1 () {
       if (!this.isActive) {
@@ -288,26 +303,26 @@ export default {
       this.importKeyword();
     },
     letter () {
-      if (this.checkList1.length === 0) {
-        this.$message.warning('请勾选设备！');
+      if (this.checkList.length === 0) {
+        this.$message.warning('请选择用户！')
       } else {
-        this.$refs.privateLetterRef.open(this.checkList1);
+        this.$refs.privateLetterRef.open(this.tableData);
       }
     },
     querygjc (page) {
-      const _this = this;
       wdsbServer.keySearch({ key_clue: this.input4, page: page }).then(res => {
         if (res.status === 200) {
           this.xsTableData = res.data.results;
           this.total1 = res.data.count;
           this.getFilterData(this.xsTableData, 'tableColumns', 'device');
         }
-      }, function () {
-        _this.$message({
-          type: 'error',
-          message: '服务异常！'
-        });
-      })
+      }).catch(error => {
+        if (error.request.status === 500) {
+          this.$message.error('服务异常！')
+        } else {
+          this.$message.error(error.request.response);
+        }
+      });
     },
     // 判断关键词是否正在执行
     isImplement () {
@@ -319,8 +334,18 @@ export default {
           }
         }
       }).catch(error => {
-        console.log(error);
-      })
+        if (error.request.status === 500) {
+          this.$message.error('服务异常！')
+        } else {
+          this.$message.error(error.request.response);
+        }
+      });
+    },
+    deleteRow (row) {
+      console.log(row);
+    },
+    deleteMore () {
+      console.log(this.checkList)
     },
     // 关键词表格复选框选中
     selectionRow (data) {
@@ -345,8 +370,7 @@ export default {
       }
     },
     getList (page) {
-      const _this = this;
-      wdsbServer.myDev({ mydev_online: 1, mydev: 1, page: page, page_size: 100 }).then(res => {
+      wdsbServer.myDev({ mydev_online: 1, page: page, page_size: 100 }).then(res => {
         if (res.status === 200) {
           if (res.data.results.length > 0) {
             this.total = res.data.count;
@@ -354,12 +378,13 @@ export default {
             this.getFilterData(this.tableData, 'sbColumns', 'group');
           }
         }
-      }, function () {
-        _this.$message({
-          type: 'error',
-          message: '服务异常！'
-        });
-      })
+      }).catch(error => {
+        if (error.request.status === 500) {
+          this.$message.error('服务异常！')
+        } else {
+          this.$message.error(error.request.response);
+        }
+      });
     },
     // 获取筛选数组
     getFilterData (data, columns, name) {
@@ -391,7 +416,7 @@ export default {
     console.log(this.btnSize)
     this.getList();
     // 是否正在执行
-    this.isImplement();
+    // this.isImplement();
     // 空对象
     var obj1 = {}
     const newData1 = this.tableData.concat();
@@ -546,5 +571,8 @@ export default {
       }
     }
   }
+}
+/deep/ .el-input-number .el-input__inner {
+  text-align: left;
 }
 </style>

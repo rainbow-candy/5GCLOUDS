@@ -45,7 +45,13 @@ export default {
               this.dialogVisible = false;
             });
           }
-        })
+        }).catch(error => {
+          if (error.request.status === 500) {
+            this.$message.error('服务异常！')
+          } else {
+            this.$message.error(error.request.response);
+          }
+        });
       } else {
         this.$message({
           message: '请输入反馈内容！',

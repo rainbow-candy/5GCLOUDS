@@ -8,7 +8,7 @@
     </div>
     <div class="content">
       <el-row>
-        <el-col v-for="(item, index) in colList1" :key="index" :xs="12">
+        <el-col v-for="(item, index) in colList1" :key="index" :xs="12" :sm="6">
           <img :src="item.src" alt="" @click="publishTask(item.src, item.label)" :class="item.name">
         </el-col>
       </el-row>
@@ -39,6 +39,9 @@ export default {
         src: require('@/assets/imgs/ssgz.png'),
         label: '搜索关注'
       }, {
+        src: require('@/assets/imgs/zdgz.png'),
+        label: '指定关注'
+      }, {
         src: require('@/assets/imgs/fsgz.png'),
         label: '粉丝关注'
       }, {
@@ -52,6 +55,9 @@ export default {
         src: require('@/assets/imgs/zbzl.png'),
         label: '直播助力'
       }, {
+        src: require('@/assets/imgs/zbjcj.png'),
+        label: '直播间采集'
+      }, {
         src: require('@/assets/imgs/scsp.png'),
         label: '上传视频'
       }]
@@ -63,12 +69,16 @@ export default {
     },
     // 跳转发布任务2
     publishTask (src, label) {
-      this.$router.push({
-        path: '/publishTask2',
-        query: { src: src, type: 'dy', name: label }
-      });
-      wdsbServer.clicknum({ task_name: label }).then(res => {
-      })
+      if (label === '正在开发') {
+        this.$message.warning('正在开发中.....')
+      } else {
+        this.$router.push({
+          path: '/publishTask2',
+          query: { src: src, type: 'dy', name: label }
+        });
+        wdsbServer.clicknum({ task_name: label }).then(res => {
+        })
+      }
     }
   }
 }
@@ -76,7 +86,7 @@ export default {
 
 <style lang="less" scoped>
 .box {
-  padding: 130px 10% 0 10%;
+  padding: 100px 10% 0 10%;
   width: 90%;
   margin-left: 5%;
   .content-title {
@@ -91,7 +101,7 @@ export default {
   .el-col {
     text-align: center;
     padding: 20px 0;
-    width: 20%;
+    // width: 20%;
     img {
       width: 150px;
       height: 188px;

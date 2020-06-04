@@ -1,8 +1,9 @@
 <template>
   <div class="box">
     <div>
-      <img src="@/assets/imgs/title-fbrw.png" alt class="content-title"/>
-      <img :src="this.$route.query.src" alt class="content-title-gn" />
+      <img src="@/assets/imgs/title-fbrw.png" alt class="content-title" v-show="isClick"/>
+      <img src="@/assets/imgs/title-cjfx.png" alt class="content-title" v-show="!isClick"/>
+      <img :src="this.$route.query.src" alt class="content-title-gn" v-show="isClick"/>
       <img src="@/assets/imgs/newlogo.png" alt class="logo-5g"/>
       <div class="to-home" @click="toHome">
         <i class="el-icon-refresh-left"></i>返回上级
@@ -12,31 +13,36 @@
       </div>
       <img src="@/assets/imgs/dy-logo.png" alt class="logo"/>
     </div>
-    <div class="search_str">
+    <div class="tab" v-if="this.$route.query.name === '直播间采集'">
+      <img src="@/assets/imgs/btn-zbjcj.png" class="span1" @click="tabChange1()"/>
+      <img src="@/assets/imgs/btn-cjfx.png" class="span2" @click="tabChange2()"/>
+    </div>
+    <div class="search_str" v-show="isClick" v-if="this.$route.query.name !== '直播间采集'">
       <el-form label-position="right" :model="ruleForm" label-width="160px" :rules="rules" ref="ruleForm" class="ruleForm">
-        <div class="required">*</div><el-form-item label="选择设备：">
+        <div class="required">*</div>
+        <el-form-item label="选择设备：">
           <i class="el-icon-plus" @click="xzsb"></i>
         </el-form-item>
-        <el-form-item label="搜索内容（大类）：" v-if="this.$route.query.name === '转发评论' || this.$route.query.name === '搜索关注' || this.$route.query.name === '垂直养号'" prop="search_str">
+        <el-form-item label="搜索内容（大类）：" v-if="this.$route.query.name === '转发评论' || this.$route.query.name === '垂直养号' || this.$route.query.name === '搜索关注'" prop="search_str">
           <el-input type="text" v-model="ruleForm.search_str" minlength="1" placeholder="请输入搜索内容"></el-input>
         </el-form-item>
         <el-form-item label="点赞数量：" v-if="this.$route.query.name === '推荐点赞' || this.$route.query.name === '同城点赞' || this.$route.query.name === '垂直养号'" prop="to_num">
           <el-input-number v-model="ruleForm.to_num" controls-position="right" :min="1" label="请输入点赞数量"></el-input-number>
         </el-form-item>
-        <el-form-item label="搜索抖音ID号：" v-if="this.$route.query.name === '指定转发评论' || this.$route.query.name === '粉丝关注'" prop="search_str">
+        <el-form-item label="搜索抖音ID号：" v-if="this.$route.query.name === '指定转发评论' || this.$route.query.name === '粉丝关注' || this.$route.query.name === '指定关注'" prop="search_str">
           <el-input type="text" v-model="ruleForm.search_str" minlength="1" maxlength="15" show-word-limit placeholder="请输入抖音ID号"></el-input>
         </el-form-item>
         <!--  -->
         <el-form-item label="关注数量：" v-if="this.$route.query.name === '搜索关注' || this.$route.query.name === '粉丝关注'" prop="to_num">
           <el-input-number v-model="ruleForm.to_num" controls-position="right" :min="1" label="请输入关注数量"></el-input-number>
         </el-form-item>
-        <el-form-item label="私信内容：" v-if="this.$route.query.name === '搜索关注' || this.$route.query.name === '粉丝关注'">
+        <el-form-item label="私信内容：" v-if="this.$route.query.name === '搜索关注' || this.$route.query.name === '粉丝关注' || this.$route.query.name === '指定关注'">
           <el-input type="textarea" v-model="ruleForm.content" :rows="3" placeholder="请输入私信内容"></el-input>
         </el-form-item>
         <el-form-item label="转发数量：" prop="to_num" v-if="this.$route.query.name.indexOf('转发评论') !== -1">
           <el-input-number v-model="ruleForm.to_num" controls-position="right" :min="1" label="请输入转发数量"></el-input-number>
         </el-form-item>
-        <el-form-item label="点赞数量筛选：" v-if="this.$route.query.name === '指定转发评论'">
+        <el-form-item label="点赞数量筛选：" v-if="this.$route.query.name === '转发评论'">
           <el-input-number v-model="ruleForm.likes" controls-position="right" :min="0" label="请输入最少点赞数量"></el-input-number>
         </el-form-item>
         <div v-if="this.$route.query.name.indexOf('转发评论') !== -1 || this.$route.query.name.indexOf('点赞') !== -1 || this.$route.query.name === '垂直养号'">
@@ -72,7 +78,8 @@
           <el-form-item label="抖音号：" prop="search_str">
             <el-input type="text" v-model="ruleForm.search_str" placeholder="请输入抖音号"></el-input>
           </el-form-item>
-          <div class="required" style="left: 50px;">*</div><el-form-item label="直播间转发：">
+          <!-- <div class="required" style="left: 50px;">*</div> -->
+          <el-form-item label="直播间转发：">
             <div class="zxfs" style="display: flex;">
               <div :class="{ active: isActives }" @click="zbjzf('0')">否</div>
               <div :class="{ active: !isActives }" @click="zbjzf('1')">是</div>
@@ -177,6 +184,8 @@
         ></el-pagination>
       </div>
     </div>
+    <!-- 直播间采集 -->
+    <cjfxModal ref="cjfxModal" v-if="this.$route.query.name === '直播间采集'"></cjfxModal>
     <xzscModal ref="xzscModal"></xzscModal>
     <forwardModal ref="forwardModal"></forwardModal>
   </div>
@@ -186,9 +195,10 @@
 import wdsbServer from '@/api/wdsb-server.js';
 import xzscModal from '@/modal/xzscModal';
 import forwardModal from '@/modal/forward';
+import cjfxModal from './fbrw-cjfx';
 
 export default {
-  components: { xzscModal, forwardModal },
+  components: { xzscModal, forwardModal, cjfxModal },
   data () {
     return {
       radio: '1',
@@ -250,7 +260,8 @@ export default {
           return time.getTime() < Date.now() - 8.64e7;
         }
       },
-      num: 0
+      num: 0,
+      isClick: true
     }
   },
   methods: {
@@ -311,7 +322,7 @@ export default {
       }
       this.num = num;
       if (num === '1') {
-        this.$refs.forwardModal.open(this.tableData);
+        this.$refs.forwardModal.open(this.selectTableRow);
       }
     },
     debounce () {
@@ -387,7 +398,6 @@ export default {
         // 单独修改的接口
         params.id = this.selectTableRow[0].id;
       }
-      const _this = this;
       wdsbServer.putDev(params).then(res => {
         if (res.status === 200) {
           if (res.data === '') {
@@ -412,12 +422,13 @@ export default {
             });
           }
         }
-      }, function () {
-        _this.$message({
-          type: 'error',
-          message: '服务异常！'
-        });
-      })
+      }).catch(error => {
+        if (error.request.status === 500) {
+          this.$message.error('服务异常！')
+        } else {
+          this.$message.error(error.request.response);
+        }
+      });
     },
     // 选择素材
     xzsc () {
@@ -458,7 +469,21 @@ export default {
       this.getList(val);
     },
     getList (page) {
-      wdsbServer.myDev({ mydev_online: 1, page: page, page_size: this.page_size }).then(res => {
+      var params = {};
+      if (this.$route.query.name !== '直播间采集') {
+        params = {
+          mydev_online: 1,
+          page: page,
+          page_size: this.page_size
+        }
+      } else {
+        params = {
+          mydev_online: 1,
+          page: 1,
+          page_size: 100
+        }
+      }
+      wdsbServer.myDev(params).then(res => {
         if (res.status === 200) {
           res.data.results.forEach((t) => {
             if (t.online === 1) {
@@ -471,7 +496,13 @@ export default {
           this.total = res.data.count;
           this.getFilterData(this.tableData);
         }
-      })
+      }).catch(error => {
+        if (error.request.status === 500) {
+          this.$message.error('服务异常！')
+        } else {
+          this.$message.error(error.request.response);
+        }
+      });
     },
 
     // 上传视频
@@ -498,6 +529,21 @@ export default {
         window.open('http://112.74.103.26/media/zbzl.xlsx', '_self');
       }
     },
+
+    tabChange1 () {
+      if (!this.isClick) {
+        this.isClick = true;
+        this.getList(this.current);
+      }
+    },
+    tabChange2 () {
+      if (this.isClick) {
+        this.isClick = false;
+        this.$refs.cjfxModal.importKeyword();
+        clearTimeout(this.timers);
+      }
+    },
+
     // 上传视频
     submit (time) {
       if (this.toFileList.length === 0) {
@@ -553,7 +599,7 @@ export default {
       formData.append('app_type', this.$route.query.type);
       formData.append('search_str', this.ruleForm.search_str);
       formData.append('to_num', this.ruleForm.to_num);
-      if (this.$route.query.name === '指定转发评论') {
+      if (this.$route.query.name === '转发评论') {
         formData.append('likes', this.ruleForm.likes);
       }
       formData.append('to_file', this.toFileList[0]);
@@ -593,7 +639,7 @@ export default {
           } else {
             _this.$message({
               message: '执行失败！',
-              type: 'success'
+              type: 'error'
             });
           }
         }
@@ -640,6 +686,21 @@ export default {
 }
 .box {
   padding: 110px 40px 0 40px;
+}
+.tab {
+  display: flex;
+  margin-top: 20px;
+  // 位置修改
+  position: absolute;
+  top: 24px;
+  left: 265px;
+  img {
+    width: 170px;
+    cursor: pointer;
+  }
+  .span2 {
+    margin-left: -37px;
+  }
 }
 .search_str {
   margin-top: 30px;
@@ -737,6 +798,7 @@ export default {
 @media screen and (max-width:770px ) {
   .to-list {
     top: 88px;
+    font-size: 15px;
   }
   .box {
     padding: 40px 0 0 0;
@@ -744,6 +806,17 @@ export default {
   .content-title-gn {
     width: 50px;
     // margin-top: -50px;
+  }
+  .tab {
+    top: -9px;
+    left: 86px;
+    img {
+      width: 70px;
+      height: 24px;
+    }
+    .span2 {
+      margin-left: -15px;
+    }
   }
   .search_str {
     margin-top: 10px;

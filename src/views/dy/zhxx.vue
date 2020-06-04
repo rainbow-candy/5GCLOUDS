@@ -10,13 +10,14 @@
       <div class="btn">
         <el-button class="refresh-btn" @click="synchro"><i class="el-icon-refresh"></i>同步</el-button>
         <el-button class="refresh-btn" @click="unfollow">批量取关</el-button>
+        <el-button class="refresh-btn" @click="getList(val, input4)"><i class="el-icon-refresh"></i>刷新</el-button>
         <el-input class="dyhSearch"
           placeholder="抖音号搜索"
           v-model="input4" @keyup.enter.native="queryDyh">
           <i slot="prefix" class="el-input__icon el-icon-search"></i>
         </el-input>
       </div>
-      <base-table ref="sbTable" :columns="tableColumns" :data="tableData" selection height="525"  @selection-change="selectionRow">
+      <base-table ref="sbTable" :columns="tableColumns" :data="tableData" selection height="525"  @selection-change="selectionRow" @renderHearder="renderHearder">
       </base-table>
       <el-pagination
         class="sp-pagenation"
@@ -57,6 +58,13 @@ export default {
           filterData: []
         },
         {
+          prop: 'online',
+          label: '在线情况',
+          sortable: true,
+          backColorqk: true,
+          minWidth: 120
+        },
+        {
           prop: 'hz_num',
           label: '获赞数量',
           minWidth: 100
@@ -78,21 +86,7 @@ export default {
         }
       ],
       selectTableRow: [],
-      tableData: [{
-        id: 0,
-        name: '1号',
-        num: 'XIAOMI',
-        taskKey: '1',
-        zt: '正在执行',
-        qk: '在线'
-      }, {
-        id: 1,
-        name: '2号',
-        num: 'XIAOMI',
-        taskKey: '2',
-        zt: '正在执行',
-        qk: '在线'
-      }]
+      tableData: []
     }
   },
   methods: {
@@ -111,7 +105,14 @@ export default {
           message: '请先选择设备！'
         });
       } else {
-        this.$refs.unfollowModal.open(this.selectTableRow, this.val);
+        var stats = this.selectTableRow.find((item) => {
+          return item.online === '离线';
+        });
+        if (stats) {
+          this.$message.warning('请选择在线的设备！')
+        } else {
+          this.$refs.unfollowModal.open(this.selectTableRow, this.val);
+        }
       }
     },
     // 搜索抖音号
@@ -123,9 +124,13 @@ export default {
       this.getList(val);
       this.val = val;
     },
+    // 筛选列表
+    renderHearder (key, label) {
+      this.val = 1;
+      this.getList(1, this.input4, key, label);
+    },
     // 获取列表
-    getList (page, dyh) {
-      const _this = this;
+    getList (page, dyh, key, label) {
       var parms = {};
       if (dyh) {
         parms = {
@@ -134,12 +139,14 @@ export default {
         }
       } else {
         parms = {
-          // info: 1,
-          mydev_online: 1,
+          info: 1,
           page: page,
           app_type: this.$route.query.type,
           dy_s: dyh
         }
+      }
+      if (key) {
+        parms[key] = label;
       }
       wdsbServer.myDev(parms).then(res => {
         if (res.status === 200) {
@@ -147,19 +154,6 @@ export default {
             const datas = res.data.results;
             this.total = res.data.count;
             datas.forEach((t) => {
-              switch (t.stats) {
-                case 0:
-                  t.stats = '未执行';
-                  break;
-                case 1:
-                  t.stats = '正在执行';
-                  break;
-                case 2:
-                  t.stats = '执行失败';
-                  break;
-                default:
-                  t.stats = '执行成功';
-              }
               if (t.online === 1) {
                 t.online = '在线';
               } else {
@@ -167,17 +161,41 @@ export default {
               }
             });
             this.tableData = datas;
-            this.getFilterData(this.tableData);
+            // this.getFilterData(this.tableData);
           } else {
             this.tableData = [];
           }
         }
-      }, function () {
-        _this.$message({
-          type: 'error',
-          message: '服务异常！'
-        });
-      })
+      }).catch(error => {
+        if (error.request.status === 500) {
+          this.$message.error('服务异常！')
+        } else {
+          this.$message.error(error.request.response);
+        }
+      });
+    },
+    getSBList () {
+      wdsbServer.myDev({ task: 1, app_type: this.$route.query.type, is_name: 1, page_size: 100 }).then(res => {
+        if (res.status === 200) {
+          this.tableColumns[1].filterData = [];
+          if (res.data.results.length > 0) {
+            res.data.results.forEach((item) => {
+              this.tableColumns[1].filterData.push(
+                Object.assign({}, { value: item.name, text: item.name })
+              )
+            });
+            this.tableColumns[1].filterData.unshift({ value: '', text: '全部' });
+          } else {
+            this.tableColumns[1].filterData = [];
+          }
+        }
+      }).catch(error => {
+        if (error.request.status === 500) {
+          this.$message.error('服务异常！')
+        } else {
+          this.$message.error(error.request.response);
+        }
+      });
     },
     // 表格复选框选中
     selectionRow (data) {
@@ -211,6 +229,7 @@ export default {
   },
   mounted () {
     this.getList();
+    this.getSBList();
   }
 }
 </script>

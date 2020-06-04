@@ -5,26 +5,69 @@
     <div class="to-home" @click="toHome"><i class="el-icon-s-home"></i>返回主界面</div>
     <img src="@/assets/imgs/ks-logo.png" alt class="logo" />
     <div class="content">
-      <div class="row">
-        <img src="@/assets/imgs/wdsb.png" alt class="leftImg" @click="wdsb" />
-        <img src="@/assets/imgs/fbrw.png" alt class="rightImg" @click="fbrw" />
-      </div>
-      <div class="row">
-        <img src="@/assets/imgs/gjcss.png" alt class="leftImg" @click="gjcss" />
-        <img src="@/assets/imgs/rwlb.png" alt class="rightImg" @click="ckrw" />
-      </div>
-      <div class="row">
-        <img src="@/assets/imgs/khfk.png" alt class="centerImg" @click="xxfk" />
-      </div>
+      <el-row>
+        <el-col :xs="12" :sm="8" v-for="(item, index) in colList1" :key="index">
+          <img :src="item.src" alt="" @click="publishTask(item.src, item.label, item.name)">
+        </el-col>
+      </el-row>
     </div>
+    <khfkModal ref="khfkModal"></khfkModal>
   </div>
 </template>
 
 <script>
+import khfkModal from '../dy/khfk';
+
 export default {
+  components: { khfkModal },
+  data () {
+    return {
+      colList1: [{
+        src: require('@/assets/imgs/wdsb.png'),
+        label: '/equipment',
+        name: '我的设备'
+      }, {
+        src: require('@/assets/imgs/fbrw.png'),
+        label: '/ksPublishTask',
+        name: '发布任务'
+      }, {
+        src: require('@/assets/imgs/rwlb.png'),
+        label: '/checkTask',
+        name: '查看任务'
+      }, {
+        src: require('@/assets/imgs/gjcss.png'),
+        label: '/keyWord',
+        name: '关键词搜索'
+      }, {
+        src: require('@/assets/imgs/khfk.png'),
+        label: '/feedback',
+        name: '客户反馈'
+      }, {
+        src: require('@/assets/imgs/zhxx.png'),
+        label: '/account',
+        name: '账号信息'
+      }]
+    }
+  },
   methods: {
     toHome () {
-      this.$router.go(-1)
+      this.$router.push({
+        path: '/home'
+      })
+    },
+    publishTask (src, label, name) {
+      if (label === '/feedback') {
+        this.$refs.khfkModal.open();
+      } else {
+        this.$router.push({
+          path: label,
+          query: {
+            src: src,
+            type: 'ks',
+            name: name
+          }
+        });
+      }
     },
     // 进入我的设备页面
     wdsb () {
@@ -78,22 +121,18 @@ export default {
   top: 18%;
   left: 0;
   width: 100%;
-  .row {
-    margin: 15px 0;
+  .el-row {
+    width: 1000px;
+    margin: 50px auto;
   }
-  img {
-    width: 20%;
-    max-width: 380px;
-    cursor: pointer;
-  }
-  .leftImg {
-    margin-left: 28%;
-  }
-  .rightImg {
-    margin-left: 2%;
-  }
-  .centerImg {
-    margin-left: 39%;
+  .el-col {
+    text-align: center;
+    padding: 20px 0;
+    img {
+      width: 280px;
+      height: 150px;
+      cursor: pointer;
+    }
   }
 }
 </style>
