@@ -8,30 +8,57 @@
       ref="ruleForm"
       class="ruleForm"
     >
-      <el-form-item label="快手号：" prop="search_str">
-        <el-input type="text" v-model="ruleForm.search_str" minlength="1" placeholder="请输入快手号"></el-input>
+      <el-form-item label="搜索内容（大类）：" prop="search_str" v-if="this.$route.query.name === '搜索点赞'">
+        <el-input type="text" v-model="ruleForm.search_str" minlength="1" placeholder="请输入搜索内容（大类）"></el-input>
       </el-form-item>
-      <el-form-item label="转发数量：" prop="to_num">
+			<el-form-item label="搜索内容（ID号）：" prop="search_str" v-if="this.$route.query.name === '精准点赞'">
+        <el-input type="text" v-model="ruleForm.search_str" minlength="1" placeholder="请输入搜索内容（ID号）"></el-input>
+      </el-form-item>
+      <el-form-item label="标签：" prop="to_num">
         <el-input-number
           controls-position="right"
           :min="1"
           v-model="ruleForm.to_num"
-          placeholder="请输入转发数量"
+          placeholder="请输入标签"
         ></el-input-number>
       </el-form-item>
-      <el-form-item label="转发文案：">
-        <!-- <el-radio v-model="radio" label="1">手动输入</el-radio>
-        <el-radio v-model="radio" label="2">批量上传</el-radio> -->
+      <el-form-item label="关注数量：" prop="content">
+        <el-input-number
+          v-model="ruleForm.content"
+          controls-position="right"
+          :min="1"
+          placeholder="请输入关注数量"
+        ></el-input-number>
+      </el-form-item>
+      <el-form-item label="点赞数量：" prop="content">
+        <el-input-number
+          v-model="ruleForm.content"
+          controls-position="right"
+          :min="1"
+          placeholder="请输入点赞数量"
+        ></el-input-number>
+      </el-form-item>
+      <el-form-item label="收藏数量：" prop="content">
+        <el-input-number
+          v-model="ruleForm.content"
+          controls-position="right"
+          :min="1"
+          placeholder="请输入收藏数量"
+        ></el-input-number>
+      </el-form-item>
+      <el-form-item label="评论内容：">
+        <el-radio v-model="radio" label="1">手动输入</el-radio>
+        <el-radio v-model="radio" label="2">批量上传</el-radio>
         <el-input
           type="textarea"
           v-model="ruleForm.content"
           :rows="2"
           show-word-limit
-          placeholder="文案条数以“|”分隔"
+          placeholder="评论条数以“|”分隔"
           @input="plnrChange"
           v-if="radio === '1'"
         ></el-input>
-        <!-- <div class="plnr" v-if="radio === '2'">
+        <div class="plnr" v-if="radio === '2'">
           <div class="xzmb" @click="xzmb">
             <i class="el-icon-download"></i>下载评论模板
           </div>
@@ -52,7 +79,7 @@
               <i class="el-icon-upload2"></i>上传评论模板
             </div>
           </el-upload>
-        </div> -->
+        </div>
       </el-form-item>
       <!-- 执行方式 -->
       <div class="required">*</div>
@@ -83,10 +110,9 @@
 // import wdsbServer from '@/api/wdsb-server.js';
 
 export default {
-  name: 'zfplModal',
+  name: 'ssdzModal',
   data () {
     return {
-      radio: '1',
       isActive: true,
       timing: false,
       pickerOptions: {
@@ -94,11 +120,12 @@ export default {
           return time.getTime() < Date.now() - 8.64e7;
         }
       },
+      radio: '1',
       ruleForm: {
         task_time: '',
         search_str: '',
         to_num: undefined,
-        content: '',
+        content: undefined,
         at_me: undefined,
         check_time: undefined
       },
@@ -128,10 +155,6 @@ export default {
           });
         }
       }
-    },
-    // 下载文件模板
-    xzmb () {
-      window.open('http://112.74.103.26/media/zfpl.xlsx', '_self');
     },
     // 切换执行方式
     implement (num) {
@@ -185,6 +208,8 @@ export default {
       formData.append('id', params.id);
       formData.append('search_str', this.ruleForm.search_str);
       formData.append('to_num', this.ruleForm.to_num);
+      formData.append('content', this.ruleForm.content);
+      formData.append('check_time', this.ruleForm.check_time);
       if (this.radio === '1') {
         formData.append('content', this.ruleForm.content);
       } else {
@@ -236,21 +261,6 @@ export default {
   top: 27px;
   color: #f56c7e;
   font-size: 15px;
-}
-.plnr {
-  display: flex;
-  .xzmb {
-    width: 200px;
-    border: 1px solid #ccc;
-    text-align: center;
-    height: 40px;
-    line-height: 40px;
-    cursor: pointer;
-    border: 1px solid #ccc;
-    border-radius: 0;
-    background-color: #53bce0;
-    color: #fff;
-  }
 }
 .zxBtn, .el-button.is-disabled {
   color: #fff;

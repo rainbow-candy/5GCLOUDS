@@ -79,20 +79,20 @@
           </el-input>
           </el-col>
         </el-row>
-        <base-table ref="sbTable" :columns="tableColumns" :data="xsTableData" selection height="530" @selection-change="selectionRow1" v-if="this.$route.query.type === 'dy'">
+        <base-table ref="sbTable" :columns="tableColumns" :data="xsTableData" selection height="530" @selection-change="selectionRow1">
           <el-table-column label="操作" width="150" align="center">
             <template slot-scope="scope">
               <el-button type="text" icon="el-icon-delete" @click="deleteRow(scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </base-table>
-        <base-table ref="sbTable" :columns="tableColumns2" :data="tableData" selection  height="530" @selection-change="selectionRow1" v-if="this.$route.query.type !== 'dy'">
+        <!-- <base-table ref="sbTable" :columns="tableColumns2" :data="tableData" selection  height="530" @selection-change="selectionRow1" v-if="this.$route.query.type !== 'dy'">
           <el-table-column label="操作" width="150" align="center">
             <template slot-scope="scope">
               <el-button type="text" icon="el-icon-delete" @click="deleteRow(scope.row)">删除</el-button>
             </template>
           </el-table-column>
-        </base-table>
+        </base-table> -->
         <el-pagination
           class="fx-pagenation"
           @current-change="handleCurrentChange1"
@@ -149,39 +149,7 @@ export default {
         filterData: [],
         width: 200
       }],
-      tableColumns: [
-        {
-          prop: 'dy_num',
-          label: '用户抖音号',
-          width: 200
-        },
-        {
-          prop: 'taskKey',
-          label: '关键词',
-          width: 200
-        },
-        {
-          prop: 'content',
-          label: '评论内容',
-          minWidth: 200
-        }
-      ],
-      tableColumns2: [
-        {
-          prop: 'name',
-          label: '快手号'
-        },
-        {
-          prop: 'num',
-          label: '评论内容'
-        },
-        {
-          prop: 'taskKey',
-          label: '关键词',
-          filter: true,
-          filterData: []
-        }
-      ],
+      tableColumns: [],
       tableData: [],
       xsTableData: [],
       // 表单必填校验
@@ -306,7 +274,12 @@ export default {
       if (this.checkList.length === 0) {
         this.$message.warning('请选择用户！')
       } else {
-        this.$refs.privateLetterRef.open(this.tableData);
+        var num = '';
+        this.checkList.forEach(t => {
+          num += t.dy_num + '|'
+        });
+        num = num.substr(0, num.length - 1);
+        this.$refs.privateLetterRef.open(this.tableData, num);
       }
     },
     querygjc (page) {
@@ -341,11 +314,38 @@ export default {
         }
       });
     },
+    deletes (id) {
+      wdsbServer.kwordSearch({ del_id: 1, id_list: id }).then(res => {
+        if (res.status === 200) {
+          this.$message({
+            message: '删除成功！',
+            type: 'success'
+          });
+          this.importKeyword(this.current1);
+        } else if (res.status === 201) {
+          this.$message({
+            message: res.data.msg,
+            type: 'error'
+          });
+        }
+      }).catch(error => {
+        if (error.request.status === 500) {
+          this.$message.error('服务异常！')
+        } else {
+          this.$message.error(error.request.response);
+        }
+      });
+    },
     deleteRow (row) {
-      console.log(row);
+      this.deletes(row.id)
     },
     deleteMore () {
-      console.log(this.checkList)
+      var id = '';
+      this.checkList.forEach(t => {
+        id += t.id + ','
+      });
+      id = id.substr(0, id.length - 1);
+      this.deletes(id)
     },
     // 关键词表格复选框选中
     selectionRow (data) {
@@ -413,7 +413,40 @@ export default {
     }
   },
   mounted () {
-    console.log(this.btnSize)
+    if (this.$route.query.type === 'dy') {
+      this.tableColumns = [
+        {
+          prop: 'dy_num',
+          label: '用户抖音号',
+          width: 200
+        },
+        {
+          prop: 'taskKey',
+          label: '关键词',
+          width: 200
+        },
+        {
+          prop: 'content',
+          label: '评论内容',
+          minWidth: 200
+        }
+      ];
+    } else {
+      this.tableColumns = [{
+        prop: 'name',
+        label: '快手号'
+      },
+      {
+        prop: 'num',
+        label: '评论内容'
+      },
+      {
+        prop: 'taskKey',
+        label: '关键词',
+        filter: true,
+        filterData: []
+      }]
+    }
     this.getList();
     // 是否正在执行
     // this.isImplement();

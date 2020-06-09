@@ -25,6 +25,7 @@
         <zfplModal ref="zfplModal" v-if="this.$route.query.name === '转发评论'"></zfplModal>
         <zbzlModal ref="zbzlModal" v-if="this.$route.query.name === '直播助力'"></zbzlModal>
         <scspModal ref="scspModal" v-if="this.$route.query.name === '上传视频'"></scspModal>
+        <srmModal ref="srmModal" v-if="this.$route.query.name === '上热门'"></srmModal>
       </el-form>
       <div style="position: relative;height: 468px;border-left:1px solid #ccc;" v-show="sbShow">
         <base-table ref="sbTable" :columns="sbColumns" :data="tableData" selection height="420" @selection-change="selectionRow" style="max-width: 550px;margin-left: 70px;"></base-table>
@@ -56,9 +57,10 @@ import zfplModal from './modal/zfpl'
 import zbzlModal from './modal/zbzl'
 import zbjcjModal from './modal/zbjcj'
 import scspModal from './modal/scsp'
+import srmModal from './modal/srm'
 
 export default {
-  components: { xzscModal, forwardModal, czyhModal, dzModal, ssgzModal, zfplModal, zbzlModal, zbjcjModal, scspModal },
+  components: { xzscModal, forwardModal, czyhModal, dzModal, ssgzModal, zfplModal, zbzlModal, zbjcjModal, scspModal, srmModal },
   data () {
     return {
       sbShow: false,

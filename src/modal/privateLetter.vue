@@ -11,8 +11,8 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="私信内容：" prop="name">
-        <el-input type="textarea" :rows="3" v-model="form.name"  placeholder="请输入私信内容"></el-input>
+      <el-form-item label="私信内容：" prop="key_w">
+        <el-input type="textarea" :rows="3" v-model="form.key_w"  placeholder="请输入私信内容"></el-input>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -31,42 +31,48 @@ export default {
     return {
       dialogVisible: false,
       form: {
-        name: '',
+        key_w: '',
         id_list: '',
-        gz_sx: 1
+        gz_sx: 1,
+        user_num: ''
       },
       rules: {
         id_list: { required: true, message: '请选择设备', trigger: 'blur' },
-        name: { required: true, message: '请输入私信内容', trigger: 'blur' }
+        key_w: { required: true, message: '请输入私信内容', trigger: 'blur' }
       },
       tableData: [],
       dialogWidth: ''
     }
   },
   methods: {
-    open (data) {
+    open (data, num) {
       this.dialogVisible = true;
       this.name = '';
       this.tableData = data;
+      this.form.user_num = num;
     },
     submit () {
-      this.form.id_list = this.form.id_list.join(',')
-      wdsbServer.kwordSearch(this.form).then(res => {
-        if (res.status === 200) {
-          this.$message({
-            message: '执行成功！',
-            type: 'success'
-          });
-          this.uploadIng = true;
-          this.dialogVisible = false;
-        } else if (res.status === 201) {
-          this.$message({
-            message: res.data.msg,
-            type: 'warning'
-          });
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          this.form.id_list = this.form.id_list.join(',')
+          wdsbServer.kwordSearch(this.form).then(res => {
+            if (res.status === 200) {
+              this.$message({
+                message: '执行成功！',
+                type: 'success'
+              });
+              this.uploadIng = true;
+              this.dialogVisible = false;
+            } else if (res.status === 201) {
+              this.$message({
+                message: res.data.msg,
+                type: 'warning'
+              });
+            }
+          }).catch(error => {
+            this.$message.error(error.request.response);
+          })
         }
-      }).catch(error => {
-        this.$message.error(error.request.response);
       })
     }
   },

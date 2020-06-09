@@ -11,48 +11,24 @@
       <el-form-item label="快手号：" prop="search_str">
         <el-input type="text" v-model="ruleForm.search_str" minlength="1" placeholder="请输入快手号"></el-input>
       </el-form-item>
-      <el-form-item label="转发数量：" prop="to_num">
+      <el-form-item label="观看数量：" prop="to_num">
         <el-input-number
           controls-position="right"
           :min="1"
           v-model="ruleForm.to_num"
-          placeholder="请输入转发数量"
+          placeholder="请输入观看数量"
         ></el-input-number>
       </el-form-item>
-      <el-form-item label="转发文案：">
-        <!-- <el-radio v-model="radio" label="1">手动输入</el-radio>
-        <el-radio v-model="radio" label="2">批量上传</el-radio> -->
-        <el-input
-          type="textarea"
+      <el-form-item label="单个视频观看次数：" prop="content">
+        <el-input-number
           v-model="ruleForm.content"
-          :rows="2"
-          show-word-limit
-          placeholder="文案条数以“|”分隔"
-          @input="plnrChange"
-          v-if="radio === '1'"
-        ></el-input>
-        <!-- <div class="plnr" v-if="radio === '2'">
-          <div class="xzmb" @click="xzmb">
-            <i class="el-icon-download"></i>下载评论模板
-          </div>
-          <el-upload
-            class="upload-demo"
-            action="http://112.74.103.26/api/task/dev/"
-            :on-change="beforeUpload"
-            :before-remove="beforeRemove"
-            multiple
-            :limit="1"
-            show-file-list
-            :auto-upload="false"
-            :on-exceed="handleExceed"
-            accept=".xls, .xlsx"
-            :file-list="fileList"
-          >
-            <div class="xzmb">
-              <i class="el-icon-upload2"></i>上传评论模板
-            </div>
-          </el-upload>
-        </div> -->
+          controls-position="right"
+          :min="1"
+          placeholder="请输入单个视频观看次数"
+        ></el-input-number>
+      </el-form-item>
+      <el-form-item label="单个视频观看时间：" prop="check_time">
+        <el-input-number v-model="ruleForm.check_time" controls-position="right" :min="1" placeholder="请输入单个视频观看时间（单位为秒）"></el-input-number>
       </el-form-item>
       <!-- 执行方式 -->
       <div class="required">*</div>
@@ -83,10 +59,9 @@
 // import wdsbServer from '@/api/wdsb-server.js';
 
 export default {
-  name: 'zfplModal',
+  name: 'srmModal',
   data () {
     return {
-      radio: '1',
       isActive: true,
       timing: false,
       pickerOptions: {
@@ -98,7 +73,7 @@ export default {
         task_time: '',
         search_str: '',
         to_num: undefined,
-        content: '',
+        content: undefined,
         at_me: undefined,
         check_time: undefined
       },
@@ -128,10 +103,6 @@ export default {
           });
         }
       }
-    },
-    // 下载文件模板
-    xzmb () {
-      window.open('http://112.74.103.26/media/zfpl.xlsx', '_self');
     },
     // 切换执行方式
     implement (num) {
@@ -185,30 +156,13 @@ export default {
       formData.append('id', params.id);
       formData.append('search_str', this.ruleForm.search_str);
       formData.append('to_num', this.ruleForm.to_num);
-      if (this.radio === '1') {
-        formData.append('content', this.ruleForm.content);
-      } else {
-        formData.append('to_file', this.toFileList[0]);
-      }
+      formData.append('content', this.ruleForm.content);
+      formData.append('check_time', this.ruleForm.check_time);
       formData.append('bulk', 1);
       formData.append('task_nick', this.$route.query.name);
       formData.append('app_type', this.$route.query.type);
       const url = 'http://112.74.103.26/api/task/dev/';
       this.$parent.$parent.makeXMLHttpRequest(url, formData, this)
-    },
-    // 上传视频
-    beforeUpload (file, fileList) {
-      if (file.size / 1024 / 1024 > 50) {
-        this.$message.warning('文件超过50M，上传失败！')
-      } else {
-        this.toFileList[0] = file.raw;
-      }
-    },
-    handleExceed (files, fileList) {
-      this.$message.warning('当前限制选择 1 个文件!');
-    },
-    beforeRemove (file, fileList) {
-      return this.$confirm(`确定移除 ${file.name}？`);
     }
   }
 }
@@ -236,21 +190,6 @@ export default {
   top: 27px;
   color: #f56c7e;
   font-size: 15px;
-}
-.plnr {
-  display: flex;
-  .xzmb {
-    width: 200px;
-    border: 1px solid #ccc;
-    text-align: center;
-    height: 40px;
-    line-height: 40px;
-    cursor: pointer;
-    border: 1px solid #ccc;
-    border-radius: 0;
-    background-color: #53bce0;
-    color: #fff;
-  }
 }
 .zxBtn, .el-button.is-disabled {
   color: #fff;

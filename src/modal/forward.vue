@@ -13,12 +13,10 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-table :data="tableData" class="sbNameTable" border stripe @selection-change="selectionRow" row-key="id" max-height="380px">
-        <el-table-column
-          type="selection"
-          width="50"
-          align="center"
-          :reserve-selection="true">
+      <el-table ref="selectUser" :data="tableData" class="sbNameTable" border stripe @selection-change="selectionRow" max-height="380px">
+      <!-- <el-table :data="tableData" ref="selectUser" class="sbNameTable" border stripe @selection-change="selectionRow" row-key="id" max-height="380px"> -->
+        <el-table-column type="selection" width="50" align="center">
+        <!-- <el-table-column type="selection" width="50" align="center" :reserve-selection="true"> -->
         </el-table-column>
         <el-table-column label="已关注用户" align="center">
           <template slot-scope="scope">
@@ -53,12 +51,13 @@ export default {
       total: 50,
       current: 1,
       dialogVisible: false,
-      checkList: [],
+      checkList: {},
       sbData: [],
       tableData: [],
       currentCheck: {},
       lastRow: 0,
-      keyWordFilter: []
+      keyWordFilter: [],
+      indexId: ''
     }
   },
   methods: {
@@ -73,25 +72,17 @@ export default {
         this.getList(this.sbData[0].id);
         this.sbData[0].iconName = 'el-icon-caret-right'
       }
-      // wdsbServer.myDev({ mydev_online: 1, page: 1, page_size: 100 }).then(res => {
-      //   if (res.status === 200) {
-      //     res.data.results.map(item => {
-      //       this.sbData.push(
-      //         Object.assign({}, item, { 'iconName': 'el-icon-caret-bottom' })
-      //       )
-      //     })
-      //     if (this.sbData.length > 0) {
-      //       this.getList(this.sbData[0].id);
-      //       this.sbData[0].iconName = 'el-icon-caret-right'
-      //     }
-      //   }
-      // })
       this.current = 1;
       this.dialogVisible = true;
     },
     // 表格复选框选中
     selectionRow (data) {
-      this.checkList = data;
+      if (data.length > 0) {
+        const isArr = data[0] instanceof Array;
+        if (!isArr) {
+          this.checkList[this.indexId] = data;
+        }
+      }
     },
     tableRowClassName ({ row, rowIndex }) {
       // 把每一行的索引放进row
@@ -111,20 +102,23 @@ export default {
       }
     },
     submit () {
-      console.log(this.checkList)
       if (this.checkList.length === 0) {
         this.$message({
           type: 'warning',
           message: '请勾选用户！'
         });
       } else {
-        var content = '';
-        this.checkList.forEach(t => {
-          content += t.attention + '|'
-        });
-        content = content.substr(0, content.length - 1);
+        var content = {};
+        for (const i in this.checkList) {
+          console.log(this.checkList[i])
+          content[i] = '';
+          this.checkList[i].forEach(t => {
+            content[i] += t.attention + '|'
+          });
+          content[i] = content[i].substr(0, content[i].length - 1);
+        }
         this.dialogVisible = false;
-        this.$parent.ruleForm.at_me = content;
+        this.$parent.ruleForm.json_me = JSON.stringify(content);
       }
     },
     // 取消
@@ -132,26 +126,36 @@ export default {
       this.dialogVisible = false;
       this.$parent.zbjzf('0');
     },
+    toggleSelection (rows) {
+      rows.forEach(row => {
+        // 不能自己自定义对象来设置选中（原因如下分析），那我可以从列表中找到需要选中的那个对象，然后把它拿过来作为选中的项就可以了
+        this.$refs.selectUser.toggleRowSelection(this.tableData.find(item => {
+          return row.attention === item.attention;
+        }), true);
+      });
+    },
     getList (id) {
+      this.indexId = id;
       this.tableData = [];
-      const _this = this;
       wdsbServer.forward({ zbzf: id }).then(res => {
         if (res.status === 200) {
           if (res.data.results.length > 0) {
             this.total = res.data.count;
-            res.data.results.map((item) => {
-              this.tableData.push(
-                Object.assign({}, item, { iconName: 'el-icon-caret-bottom' })
-              )
-            })
+            this.tableData = res.data.results;
             this.getFilterData(this.tableData);
+            if (this.checkList[this.indexId] && this.checkList[this.indexId].length > 0) {
+              this.$nextTick(() => {
+                this.toggleSelection(this.checkList[this.indexId]);
+              })
+            }
           }
         }
-      }, function () {
-        _this.$message({
-          type: 'error',
-          message: '服务异常！'
-        });
+      }).catch(error => {
+        if (error.request.status === 500) {
+          this.$message.error('服务异常！')
+        } else {
+          this.$message.error(error.request.response);
+        }
       })
     },
     // 获取筛选数组

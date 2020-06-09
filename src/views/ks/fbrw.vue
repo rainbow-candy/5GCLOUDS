@@ -8,7 +8,7 @@
     </div>
     <div class="content">
       <el-row>
-        <el-col :xs="12" :sm="6" v-for="(item, index) in colList1" :key="index">
+        <el-col :xs="12" :sm="8" v-for="(item, index) in colList1" :key="index">
           <img :src="item.src" alt="" @click="publishTask(item.src, item.label)">
         </el-col>
       </el-row>
@@ -24,6 +24,9 @@ export default {
       colList1: [{
         src: require('@/assets/imgs/ks/czyh.png'),
         label: '垂直养号'
+      }, {
+        src: require('@/assets/imgs/ks/srm.png'),
+        label: '上热门'
       }, {
         src: require('@/assets/imgs/ks/fxdz.png'),
         label: '发现点赞'
@@ -79,9 +82,10 @@ export default {
   margin-top: 30px;
   .el-col {
     text-align: center;
-    padding: 30px 0;
+    padding: 10px 0;
     img {
-      width: 160px;
+      width: 150px;
+      height: 197px;
       cursor: pointer;
     }
   }

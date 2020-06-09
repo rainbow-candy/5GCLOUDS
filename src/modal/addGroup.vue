@@ -146,6 +146,12 @@ export default {
           });
           this.$parent.getList();
         }
+      }).catch(error => {
+        if (error.request.status === 500) {
+          this.$message.error('服务异常！')
+        } else {
+          this.$message.error(error.request.response);
+        }
       })
     },
     // 重新勾选
@@ -160,7 +166,6 @@ export default {
     },
     getList (page) {
       this.tableData = [];
-      const _this = this;
       wdsbServer.myDev({ mydev: 1, page: page }).then(res => {
         if (res.status === 200) {
           if (res.data.results.length > 0) {
@@ -170,11 +175,12 @@ export default {
             this.reSelect();
           }
         }
-      }, function () {
-        _this.$message({
-          type: 'error',
-          message: '服务异常！'
-        });
+      }).catch(error => {
+        if (error.request.status === 500) {
+          this.$message.error('服务异常！')
+        } else {
+          this.$message.error(error.request.response);
+        }
       })
     },
     // 获取筛选数组

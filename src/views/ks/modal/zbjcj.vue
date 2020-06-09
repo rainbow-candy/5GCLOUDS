@@ -276,15 +276,42 @@ export default {
         this.$refs.privateLetterRef.open(this.$parent.tableData);
       }
     },
+    deletes (id) {
+      wdsbServer.kwordSearch({ del_id: 1, id_list: id }).then(res => {
+        if (res.status === 200) {
+          this.$message({
+            message: '删除成功！',
+            type: 'success'
+          });
+          this.importKeyword(this.current1);
+        } else if (res.status === 201) {
+          this.$message({
+            message: res.data.msg,
+            type: 'error'
+          });
+        }
+      }).catch(error => {
+        if (error.request.status === 500) {
+          this.$message.error('服务异常！')
+        } else {
+          this.$message.error(error.request.response);
+        }
+      });
+    },
     deleteRow (row) {
-      console.log(row);
+      this.deletes(row.id)
     },
     // 线索表格复选框选中
     selectionRow1 (data) {
       this.checkList1 = data;
     },
     deleteMore () {
-      console.log(this.checkList1)
+      var id = '';
+      this.checkList1.forEach(t => {
+        id += t.id + ','
+      });
+      id = id.substr(0, id.length - 1);
+      this.deletes(id)
     },
     handleCurrentChange1 (val) {
       this.current1 = val;

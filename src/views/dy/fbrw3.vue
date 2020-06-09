@@ -141,10 +141,10 @@
             <el-input type="text" v-model="ruleForm.search_str" placeholder="请输入抖音号"></el-input>
           </el-form-item>
           <el-form-item label="观看视频数量："  prop="to_num">
-            <el-input-number v-model="ruleForm.to_num" controls-position="right" :min="0" label="请输入观看数量"></el-input-number>
+            <el-input-number v-model="ruleForm.to_num" controls-position="right" :min="0" placeholder="请输入观看数量"></el-input-number>
           </el-form-item>
           <el-form-item label="单个视频观看次数："  prop="content">
-            <el-input-number v-model="ruleForm.content" controls-position="right" :min="0" label="请输入单个视频观看数量"></el-input-number>
+            <el-input-number v-model="ruleForm.content" controls-position="right" :min="0" placeholder="请输入单个视频观看数量"></el-input-number>
           </el-form-item>
           <el-form-item label="单个视频观看时间："  prop="check_time">
             <el-input-number v-model="ruleForm.check_time" controls-position="right" :min="0"  placeholder="大于单个视频的时长（单位为秒）"></el-input-number>
@@ -214,7 +214,8 @@ export default {
         spwb: '',
         at_me: '',
         check_time: undefined,
-        likes: ''
+        likes: '',
+        json_me: ''
       },
       fileList: [],
       toFileList: [],
@@ -591,7 +592,9 @@ export default {
         params.id += t.id + ','
       });
       params.id = params.id.substr(0, params.id.length - 1);
-
+      if (this.$route.query.name === '直播助力' && !this.isActives) {
+        formData.append('json_me', this.ruleForm.json_me);
+      }
       // 观看直播时间
       formData.append('id', params.id);
       formData.append('content', this.ruleForm.content);

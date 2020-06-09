@@ -21,6 +21,7 @@ module.exports = {
     'no-invalid-this': 'error',
     'no-regex-spaces': 0,
     'no-invalid-regexp': 0,
-    'no-useless-escape': 0
+    'no-useless-escape': 0,
+    'space-unary-ops': 'off'
   }
 }
