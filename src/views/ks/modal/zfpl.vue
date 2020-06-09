@@ -117,7 +117,7 @@ export default {
     getParms () {
       return this.ruleForm
     },
-    // 评论内容修改
+    // 评论内容修改，11111
     plnrChange (e) {
       const arr = e.split('|');
       for (let i = 0; i < arr.length; i++) {
